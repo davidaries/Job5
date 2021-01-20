@@ -15,6 +15,7 @@ from system_time import system_time
 base_language = '~101'
 
 root = Tk()
+"""HERE"""
 
 root.title(ld.get_text_from_dict(base_language, '~11'))  # title for window
 root.geometry('430x100+0+0')  # main window geometry
