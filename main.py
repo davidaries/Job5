@@ -4,7 +4,7 @@ This involves the creation of multiple windows
 A root window is created that displays the current time in the simulation.  This root windows also contains a pause
 and unpause button (to pause and unpause the program), a button that prints a summary to the console, a button
 that generates a login window for a staffer, and a test button that opens all staffer windows and logs them in
-
+HELLO!
 """
 from tkinter import *
 import language_dictionary as ld
