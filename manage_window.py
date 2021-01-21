@@ -2,7 +2,8 @@ from tkinter import *
 import language_dictionary as ld
 import query
 from widgets import widgets as wd
-
+from log_interactor import log_interactor as li
+from icecream import ic
 
 class manage_window:
     """
@@ -92,6 +93,7 @@ class manage_window:
         self.tokens_completed = []
         self.at_home = True
         self.widget_creator = wd(root, self.language, self.window)
+        self.log_int = li(self.language, self.window)
 
     def get_device_id(self):
         """Returns the device id of a staffers screen"""
@@ -237,6 +239,7 @@ class manage_window:
                 self.widget_creator.add_check_boxes(item[1:])
             elif item[0] == 'Button':
                 self.add_button_submit(item[1])
+        self.log_int.create_buttons(self.widget_creator.task_row, token)
 
     def clear_window(self):
         """This function clears the window that it is given allowing it to be a blank canvas before the window
@@ -255,11 +258,6 @@ class manage_window:
                             command=lambda: self.submit_btn_listener(),
                             fg="black", bg="gray", height=1, width=10)
         btn_submit.grid(row=self.widget_creator.task_row, column=0, sticky='S')
-        btn_return = Button(self.window, text=ld.get_text_from_dict(self.language, '~8'),  # ~8 for return/regresa
-                            command=self.return_home,
-                            fg="black", bg="gray", height=1, width=10)
-        btn_return.grid(row=self.widget_creator.task_row, column=1, sticky='S')
-        self.task_row += 1
 
     def return_home(self):
         """This function returns the staffer to their home screen without completing the job so the person in question
@@ -294,7 +292,7 @@ class manage_window:
             self.tokens_completed.append(self.working_token)
             self.working_token = None
             self.widget_creator.clear_widget_data()
-            self.task_row = 10
+            self.widget_creator.task_row=0
             self.set_home()
             self.refresh_home()
 

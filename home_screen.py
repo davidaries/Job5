@@ -2,6 +2,8 @@ from tkinter import *
 from manage_window import manage_window
 import initial_load_data as ild
 from login_manager import login_manager as lm
+from icecream import ic
+import log_test
 
 
 class home_screen:
@@ -50,6 +52,8 @@ class home_screen:
         self.root = master
         self.log_window_pointer = log_window
         self.horizontal_spacing = 0
+        self.vertical_spacing = -200
+        self.window_count = 0
         self.column_padding = 80
         self.row_padding = 12
         self.row_current = 2
@@ -57,31 +61,35 @@ class home_screen:
         self.staff_dict = {}
         self.home = None
 
-    def create_home_screen(self, v):
+    def create_home_screen(self):
         """In charge of the creation of a new window to be displayed on the screen
         :param v: is a value used for the vertical spacing of the staffers windows in the UI
         :type v: str
         :return: a reference to a window so it can be edited in the future
         :rtype: Window"""
-        home = Toplevel(self.root)
-        home.geometry("400x300+" + self.horizontal_spacing.__str__() + v)
+        if self.window_count % 4 == 0:
+            self.vertical_spacing += 350
+            self.horizontal_spacing = 0
+        screen = Toplevel(self.root)
+        screen.geometry("400x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
         self.horizontal_spacing += 450
-        return home
+        return screen
 
     def login_screen(self):
         """This function creates the login screen for the various staffer by making calls to the login_manager
         module"""
-        window = self.create_home_screen('+150')
+        window = self.create_home_screen()
         login_manager = lm(self.root, '~101', self.home, window)
         login_manager.add_entry_id()
         login_manager.add_entry_password()
         login_manager.login_button()
+        self.window_count += 1
 
     def login_all(self):
         """This function creates a window for all available staff members and bypasses the login screen for all of
         those staff members"""
         for staff in ild.staffers:
-            window = self.create_home_screen('+150')
+            window = self.create_home_screen()
             staff_info = ild.staffers.get(staff)
             device_id = ild.staff_device.get(staff)
             ild.staffer_login_info.get(staff).__setitem__(1, True)
@@ -91,6 +99,7 @@ class home_screen:
             self.staff_dict[device_id].clear_window()
             self.staff_dict[device_id].set_home()
             self.staff_dict[device_id].poll_controller()
+            self.window_count += 1
 
     def login_success(self, staffer_id, window):
         """After a successful login from a staffer, this function creates a home screen for them with their
@@ -128,4 +137,5 @@ class home_screen:
         :type token: int
         :param data_return: list of the corresponding data for the token
         :type data_return: list"""
+        ic(log_test.get_log(token))
         self.controller.return_completion(token, data_return)

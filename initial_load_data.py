@@ -67,7 +67,11 @@ staffers = {                # a primitive dictionary for staffers that will do f
     's001': {'~1': 'Joe', '~23': '~24', '~100': '~101'},
     's002': {'~1': 'Jose', '~23': '~25', '~100': '~102'},
     's003': {'~1': 'Maria', '~23': '~26', '~100': '~101'},
-    's004': {'~1': 'Mary', '~23': '~27', '~100': '~102'}
+    's004': {'~1': 'Mary', '~23': '~27', '~100': '~102'},
+    's005': {'~1': 'Ally', '~23': '~24', '~100': '~101'},
+    's006': {'~1': 'Mack', '~23': '~25', '~100': '~102'},
+    's007': {'~1': 'Natasha', '~23': '~26', '~100': '~101'},
+    's008': {'~1': 'Doreen', '~23': '~27', '~100': '~102'}
     }
 
 # these next two rows to be dynamically generated when we have staff login in place.
@@ -75,10 +79,13 @@ staff_device = {'s001': 123, 's002': 234, 's003': 345, 's004': 456}
 device_staff = {123: 's001', 234: 's002', 345: 's003', 456: 's004'}
 
 staffer_login_info = {'s001': ['pass', False], 's002': ['pass', False],
-                      's003': ['pass', False], 's004': ['pass', False]}
+                      's003': ['pass', False], 's004': ['pass', False],
+                      's005': ['pass', False], 's006': ['pass', False],
+                      's007': ['pass', False], 's008': ['pass', False]
+                      }
 
 # PERSON RELATED DATA ###############################################################
-entrants = [['07:05', 'pers101'],  ['07:10', 'pers102'],  ['07:20', 'pers103'],   # what time they enter the clinic
+entrants = [['07:02', 'pers101'],  ['07:10', 'pers102'],  ['07:20', 'pers103'],   # what time they enter the clinic
             ['07:30', 'pers104'],  ['07:45', 'pers105'],  ['08:00', 'pers106']]
 
 # adat is a dictionary where the key is the person, and then each person is a dictionary

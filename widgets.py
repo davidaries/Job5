@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import font as tk_font
 import initial_load_data as ild
 import query
+from icecream import ic
 
 
 class widgets:
