@@ -3,6 +3,7 @@ from icecream import ic
 log_dict={}
 
 def add_to_log(token, txt):
+    # basic log addition
     ic(token)
     ic(txt)
     if token in log_dict:
