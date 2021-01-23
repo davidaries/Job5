@@ -2,12 +2,15 @@ from tkinter import *
 from language_dictionary import language_dictionary as ld
 from icecream import ic
 import log_test
+import working_data
 
 
-class log_interactor:
-    def __init__(self, language, window):
+class log_interactor: # rename to task_reassign
+    def __init__(self, language, window, home, device_id):
         self.language = language
         self.window = window
+        self.home = home
+        self.device_id = device_id
 
     def create_buttons(self, row, token):
         row += 1
@@ -43,25 +46,48 @@ class log_interactor:
         btn_drop.grid(row=row, column=2, sticky='S')
 
     def pause_btn_listener(self, token):
+        self.log_interface('pause')
         print('pause')
-        log_test.add_to_log(token, 'test pause')
+        working_data.add_to_log(token, 'test pause')
 
     def forward_btn_listener(self, token):
+        self.log_interface('forward')
         print('forward')
-        log_test.add_to_log(token, 'test forward')
+        working_data.add_to_log(token, 'test forward')
 
     def reassign_btn_listener(self, token):
+        self.log_interface('reassign')
         print('reassign')
-        log_test.add_to_log(token, 'test reassign')
+        working_data.add_to_log(token, 'test reassign')
 
     def return_btn_listener(self, token):
+        self.log_interface('return')
         print('return')
-        log_test.add_to_log(token, 'test return')
+        working_data.add_to_log(token, 'test return')
 
     def skip_btn_listener(self, token):
+        self.log_interface('skip')
         print('skip')
-        log_test.add_to_log(token, 'test skip')
+        working_data.add_to_log(token, 'test skip')
 
     def drop_btn_listener(self, token):
+        self.log_interface('drop')
         print('drop')
-        log_test.add_to_log(token, 'test drop')
+        working_data.add_to_log(token, 'test drop')
+
+    def base_log_screen(self):
+        self.log_interface('BASE')
+        print('BASE')
+
+    def log_interface(self, action):
+        self.clear_window()
+        log_input = Text(self.window, height = 9, width = 30)
+        log_input.pack()
+        Button(self.window, text = 'Submit', command = lambda :  self.home.reset_staffer_home(self.device_id)).pack()
+
+    def clear_window(self):
+        """This function clears the window that it is given allowing it to be a blank canvas before the window
+        is repopulated with different widgets
+        """
+        for widget in self.window.winfo_children():
+            widget.destroy()

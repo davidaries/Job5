@@ -5,16 +5,17 @@ import random
 import initial_load_data as ild
 import get_responsible_staff as grs
 import murphy
+import simulation_time as sim_time
 
-global sim_time
-
-
-def set_sim_time(s_time):
-    """This function creates a reference to the simulation time module used for reporting current simulatio time
-    :param s_time: a reference to the system_time module
-    :type s_time: module"""
-    global sim_time
-    sim_time = s_time
+# global sim_time
+#
+#
+# def set_sim_time(s_time):
+#     """This function creates a reference to the simulation time module used for reporting current simulatio time
+#     :param s_time: a reference to the system_time module
+#     :type s_time: module"""
+#     global sim_time
+#     sim_time = s_time
 
 # START - function to process the calls for UI (or other external agent)  ######
 def process_call_for_pe_queues(call, pdata_appendum, pe_outs, pe_waits):
@@ -27,7 +28,7 @@ def process_call_for_pe_queues(call, pdata_appendum, pe_outs, pe_waits):
 
 # START - function to create a pe_out and a pe_wait - called by process_call_for_pe_queues and is part of PE #####
 def create_pe_queues_additions(pdata_appendum, protostep):
-    global sim_time
+    # global sim_time
     # for reference pdata_appendum = [pdatm[0], person[1], entity[2], caller[3],
     #                                 protocol[4], step[5], thread[6], record_dts[7], datas[8]]
     protocol, step, priority = protostep[0], protostep[1], protostep[2]
