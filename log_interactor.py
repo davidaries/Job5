@@ -13,7 +13,6 @@ class log_interactor: # rename to task_reassign
         self.device_id = device_id
 
     def create_buttons(self, row, token):
-        row += 1
         for _ in range(3):  # space buttons need to figure out a better way to do this
             row += 1
             Label(self.window, text=' ').grid(row=row, column=0)

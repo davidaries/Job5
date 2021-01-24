@@ -72,8 +72,8 @@ class home_screen:
             self.vertical_spacing += 350
             self.horizontal_spacing = 0
         screen = Toplevel(self.root)
-        screen.geometry("400x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
-        self.horizontal_spacing += 450
+        screen.geometry("480x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
+        self.horizontal_spacing += 500
         return screen
 
     def login_screen(self):

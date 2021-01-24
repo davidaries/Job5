@@ -96,7 +96,15 @@ def summary():
     for j in working_data.pe_waits:
         print(j, working_data.pe_waits[j])
 
+    print('\nadats =', ild.adat)
+    for i in ild.adat:
+        print('person = ', i)
+        for ii in ild.adat[i]:
+            print('  ', ii, ild.adat[i][ii])
+
+
 # ### END - PRINTING CURRENT DATA STATUS - ONLY FOR REVIEW/TROUBLESHOOTING ##########
+
 def setup_ui():
     base_language = '~101'
 

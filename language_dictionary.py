@@ -58,6 +58,8 @@ english = {
     '~45': 'Height',
     '~46': 'Meters',
     '~47': 'BMI',
+    '~48': 'Status',
+    '~49': 'Priority',
     '~100': 'Language Preference',
     '~101': 'English',
     '~102': 'Spanish'
@@ -111,6 +113,8 @@ spanish = {
     '~45': 'la estatura',
     '~46': 'Meters',
     '~47': 'BMI',      # might be IMC for índice de masa corporal
+    '~48': 'Estado',
+    '~49': 'Prioridad',
     '~100': 'Preferencia de idioma',
     '~101': 'ingles',
     '~102': 'espanol'

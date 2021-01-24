@@ -5,6 +5,8 @@ from sim_staff_widgets import widgets as wd
 import working_data
 import simulation_time as sim_time
 import log_interactor
+from icecream import ic
+
 
 class manage_window:
     """
@@ -75,7 +77,7 @@ class manage_window:
         self.home = home
         # self.log_window = log
         self.window = window
-        self.window.bind('<Return>', lambda event: self.return_input_listener()) #binds Return key to submit button
+        self.window.bind('<Return>', lambda event: self.return_input_listener())  # binds Return key to submit button
         self.working_token = None
         # self.sim_time = sim_time
         self.staff_name = staffer.get('~1')
@@ -94,7 +96,7 @@ class manage_window:
         self.tokens_completed = []
         self.at_home = True
         self.widget_creator = wd(root, self.language, self.window)
-        self.log_int = log_interactor.log_interactor(self.language,self.window, self.home, self.device_id)
+        self.log_int = log_interactor.log_interactor(self.language, self.window, self.home, self.device_id)
 
     def get_device_id(self):
         """Returns the device id of a staffers screen"""
@@ -114,6 +116,7 @@ class manage_window:
                 if task not in self.token_list and task not in self.tokens_completed:
                     self.token_start_time[task] = tasks.get(task)[6]
                     if self.at_home:
+                        ic(tasks.get(task))
                         self.send_data(task, tasks.get(task))
                 if task not in self.token_list and task not in self.tokens_completed:
                     self.token_list.append(task)
@@ -150,10 +153,10 @@ class manage_window:
             person_id = raw_data[0]
             task_window_info = raw_data[5]
             priority = raw_data[2]
-            self.populate_task_btn(task_id, person_id, task_window_info, token, priority)
+            self.populate_task(task_id, person_id, task_window_info, token, priority)
             self.row_current += 1
 
-    def populate_task_btn(self, task_id, person_id, task_window_info, token, priority):
+    def populate_task(self, task_id, person_id, task_window_info, token, priority):
         """This function adds the buttons for the staffer's task to the task window.
         :param task_id: the value that corresponds to the task that the staffer needs to complete
         :type task_id: str
@@ -163,13 +166,24 @@ class manage_window:
         :type task_window_info: list
         :param token: the unique token id for the information handled by the staff member
         :type token: int"""
-        task_name = ld.get_text_from_dict(self.language, task_id)
-        self.add_person_to_tasks(person_id, priority, token)
-        btn_action: Button = Button(self.window, text=task_name,
-                                    command=lambda: self.write_task_screen(task_window_info, person_id, token, task_id),
-                                    fg="black", bg="gray", height=1, width=10)
-        btn_action.grid(column=3, row=self.row_current, ipadx=self.row_padding)
+        # task_name = ld.get_text_from_dict(self.language, task_id)
+        self.add_person_to_tasks(priority, token, task_id)
+        btn_log: Button = Button(self.window, text=ld.get_text_from_dict(self.language, '~13'),
+                                 command=lambda: self.view_log_data(token), fg="black", bg="gray")
+        btn_log.grid(column=5, row=self.row_current)
+        btn_process: Button = Button(self.window, text=' -> ',
+                                     command=lambda: self.write_task_screen(task_window_info, person_id, token,
+                                                                            task_id),
+                                     fg="black", bg="gray")
+        btn_process.grid(column=6, row=self.row_current)
         self.row_current += 1
+        name = query.adat_person_key(person_id, '~1')[1]  # maybe list handling should be done in query.py
+        label_name = Label(self.window, text=name, font=self.widget_creator.medium_font)
+        label_name.grid(column=0, row=self.row_current, sticky='W')
+        self.row_current += 1
+
+    def view_log_data(self, token):
+        print(token)
 
     def set_home(self):
         """This function sets up the home screen for the staffer"""
@@ -180,19 +194,29 @@ class manage_window:
 
     def add_column_headers(self):
         """This function adds the headers for the tasks in the home screen"""
-        label_name = Label(self.window, text=ld.get_text_from_dict(self.language, '~1') + '\t',
+        label_priority = Label(self.window, text=ld.get_text_from_dict(self.language, '~49') + '  ',
+                               font=self.widget_creator.medium_font)
+        label_priority.grid(column=0, row=self.row_current)
+        label_status = Label(self.window, text=ld.get_text_from_dict(self.language, '~48') + '  ',
+                             font=self.widget_creator.medium_font)
+        label_status.grid(column=1, row=self.row_current, sticky='W')
+        label_time = Label(self.window, text=ld.get_text_from_dict(self.language, '~10') + '  ',
                            font=self.widget_creator.medium_font)
-        label_name.grid(column=0, row=self.row_current, ipady=self.row_padding, sticky='W')
-        label_time = Label(self.window, text='  Time\t', font=self.widget_creator.medium_font)
-        label_time.grid(column=1, row=self.row_current, ipady=self.row_padding)
-        label_priority = Label(self.window, text='  Priority\t', font=self.widget_creator.medium_font)
-        label_priority.grid(column=2, row=self.row_current, ipady=self.row_padding)
-        label_event = Label(self.window, text=ld.get_text_from_dict(self.language, '~1'),
-                            font=self.widget_creator.medium_font)
-        label_event.grid(column=3, row=self.row_current, ipadx=self.column_padding, ipady=self.row_padding)
+        label_time.grid(column=2, row=self.row_current)
+        label_repost_time = Label(self.window, text='Repost Time  ', font=self.widget_creator.medium_font)
+        label_repost_time.grid(column=3, row=self.row_current)
+        label_task = Label(self.window, text=ld.get_text_from_dict(self.language, '~33') + '  ',
+                           font=self.widget_creator.medium_font)
+        label_task.grid(column=4, row=self.row_current, sticky='W')
+        label_log = Label(self.window, text=ld.get_text_from_dict(self.language, '~13') + '  ',
+                          font=self.widget_creator.medium_font)
+        label_log.grid(column=5, row=self.row_current)
+        label_process = Label(self.window, text='  ',
+                              font=self.widget_creator.medium_font)
+        label_process.grid(column=6, row=self.row_current, sticky='W')
         self.row_current += 1
 
-    def add_person_to_tasks(self, person_id, priority, token):
+    def add_person_to_tasks(self, priority, token, task_id):
         """This function adds the name of a person who needs to be processed by the staffer
         :param person_id: identification number of the person
         :type person_id: int
@@ -200,15 +224,25 @@ class manage_window:
         :type priority: int
         :param token: the token value of the task in question
         :type token: int"""
-        name = query.adat_person_key(person_id, '~1')[1]  # maybe list handling should be done in query.py
-        label_name = Label(self.window, text=name, font=self.widget_creator.medium_font)
-        label_name.grid(column=0, row=self.row_current, ipady=self.row_padding, sticky='W')
+        priority_color = {1: "red", 2: "blue", 3: "black"}
+
+        label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font,
+                               fg=priority_color.get(priority))
+        label_priority.grid(column=0, row=self.row_current)
+        label_status = Label(self.window, text=ld.get_text_from_dict(self.language, '~48')
+                             #####CHANGE TO GET ACTUAL STATUS
+                             , font=self.widget_creator.medium_font)
+        label_status.grid(column=1, row=self.row_current)
         time_difference = sim_time.get_time_difference(self.token_start_time.get(token))
-        label_time = Label(self.window, text=time_difference, font=self.widget_creator.medium_font)  # will be actual time
+        label_time = Label(self.window, text=time_difference,
+                           font=self.widget_creator.medium_font)  # will be actual time
         self.token_time_label[token] = label_time
-        label_time.grid(column=1, row=self.row_current, ipady=self.row_padding)
-        label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font)
-        label_priority.grid(column=2, row=self.row_current, ipady=self.row_padding)
+        label_time.grid(column=2, row=self.row_current)
+        label_repost_time = Label(self.window, text='RPT', font=self.widget_creator.medium_font)
+        label_repost_time.grid(column=3, row=self.row_current)
+        label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
+                           font=self.widget_creator.medium_font)
+        label_task.grid(column=4, row=self.row_current)
 
     def write_task_screen(self, task_window_info, person_id, token, task_id):
         """This function makes calls to widgets module to display widgets in the UI
@@ -242,6 +276,16 @@ class manage_window:
             elif item[0] == 'Button':
                 self.add_button_submit(item[1])
         self.log_int.create_buttons(self.widget_creator.task_row, token)
+        #####THIS WILL GO SOMEWHERE ELSE EVENTUALLY##### PRIORITY
+        var = IntVar()
+        pri_lbl = Label(self.window,text=ld.get_text_from_dict(self.language, '~49') + ':', font = self.widget_creator.medium_font)
+        pri_radio_1 = Radiobutton(self.window, text='1', fg="red", variable=var, value=1)
+        pri_radio_2 = Radiobutton(self.window, text='2', fg="blue", variable=var, value=2)
+        pri_radio_3 = Radiobutton(self.window, text='3', fg="black", variable=var, value=3)
+        pri_lbl.grid(row=self.widget_creator.task_row+1, column=0, sticky='W')
+        pri_radio_1.grid(row=self.widget_creator.task_row+1, column=1, sticky='W')
+        pri_radio_2.grid(row=self.widget_creator.task_row+1, column=2, sticky='W')
+        pri_radio_3.grid(row=self.widget_creator.task_row+1, column=3, sticky='W')
 
     def clear_window(self):
         """This function clears the window that it is given allowing it to be a blank canvas before the window
@@ -301,15 +345,13 @@ class manage_window:
             self.widget_creator.clear_widget_data()
             self.task_row = 10
             self.set_home()
-            print(working_data.pe_outs)
+            # print(working_data.pe_outs)
             self.refresh_home()
-
-
 
     def add_to_log(self):
         """This function adds the data that will be sent back to the protocol manager to the log window
         print statement is so you can see how the actual value looks in the program not just the log printed version"""
-        if len(self.value_holder) == len(self.widgets) and len(self.value_holder)>0:
+        if len(self.value_holder) == len(self.widgets) and len(self.value_holder) > 0:
             return_data = []
             for _ in range(len(self.value_holder)):
                 return_data.append(self.value_holder.pop())

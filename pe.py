@@ -109,7 +109,7 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
             calls = pe_wait[9].get('call')
             if calls:  # there can be more than one call
                 for call in calls:
-                    calls_list.append([call, pdata_appendum, pe_outs, pe_waits])
+                    calls_list.append([call, pdata_appendum, pe_outs, pe_waits])    # Jan 22 wondering if we need to / should send pe_outs and pe_waits to the call_list every time
             # And finally need to remove the lines processed from pe_outs and pe_waits
             del pe_outs[pe_waits[token_in][0]][token_in]
             del pe_waits[token_in]
@@ -135,7 +135,7 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
             calls = pe_in_unsol[2].get('call')
             if calls:
                 for call in calls:
-                    calls_list.append([call, pdata_appendum, pe_outs, pe_waits])
+                    calls_list.append([call, pdata_appendum, pe_outs, pe_waits])     # Jan 22 wondering if we need to / should send pe_outs and pe_waits to the call_list every time
             # And finally need to remove the lines processed from pe_outs and pe_waits
             if token_in != 'ip01':
                 del pe_outs[pe_waits[token_in][0]][token_in]
@@ -149,15 +149,38 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
                 if datums:  # we gather the additional data needed to append to adat
                     for datum in datums:
                         datas_expansion(pdat[1], pdat[2], pdat[0], datum)
-
+    pdata_appendum, pdata_appendums = [], []
 
     if calls_list:
-        for call in calls_list:  #  now we need to get what they are calling
-            call_type = ild.protocols[call[0][0]][1][2]
+        while calls_list:
+            call = calls_list.pop(0)  # now we need to get what they are calling
+            proto_ = call[0][0]
+            step_ = call[0][1]
+            call_type = ild.protocols[proto_][step_][2]
             if call_type == 'murphy':
-                spec = ild.protocols[call[0]][call[1]][3]
-                result = murphy.murphy(person, spec)
-                # now we need to write to pdata and adat, then go on to the next line
+                spec = ild.protocols[proto_][step_][3]
+                datas = murphy.murphy(person, spec)
+                calls = ild.protocols[proto_][step_][5].get('call')
+                # now we need to create the line to write to pdata
+                pdatm = random.randint(100001, 999999)
+                entity = call[1][2]
+                caller = call[1][0]
+                protocol = proto_
+                step = step_
+                thread = call[1][6]
+                record_dts = sim_time.get_time_stamp()
+                pdata_appendum = [pdatm, person, entity, caller, protocol, step, thread, record_dts, datas]
+                pdata.append(pdata_appendum)   # append to pdata
+                datas_expansion(person, entity, pdatm, datas['data'][0])  # now we need to call the expansion to adat
+                # now, time to think routing: where do I find that - where it specifies step 4?
+                calls_from_murphy = ild.protocols[proto_][step_][5].get('call')
+                if calls_from_murphy:
+                    for call_fm in calls_from_murphy:
+                        call_type_fm = ild.protocols[call_fm[0]][call_fm[1]][2]
+                        if call_type_fm == 'UI':
+                            process_call_for_pe_queues(call_fm, pdata_appendum, pe_outs, pe_waits)
+                        elif call_type_fm == 'murphy':
+                            calls_list.append([call_fm, pdata_appendum, pe_outs, pe_waits])
             elif call_type == 'UI':
                 process_call_for_pe_queues(call[0], call[1], call[2], call[3])
             elif call_type == 'decisioning':
