@@ -60,6 +60,11 @@ english = {
     '~47': 'BMI',
     '~48': 'Status',
     '~49': 'Priority',
+    '~50': 'Forward',
+    '~51': 'Reassign',
+    '~52': 'Skip',
+    '~53': 'Drop',
+    '~54': 'Close',
     '~100': 'Language Preference',
     '~101': 'English',
     '~102': 'Spanish'
@@ -115,6 +120,11 @@ spanish = {
     '~47': 'BMI',      # might be IMC for índice de masa corporal
     '~48': 'Estado',
     '~49': 'Prioridad',
+    '~50': 'Reenviar',
+    '~51': 'Reasignar',
+    '~52': 'Saltarse',
+    '~53': 'Soltar',
+    '~54': 'Cerrar',
     '~100': 'Preferencia de idioma',
     '~101': 'ingles',
     '~102': 'espanol'

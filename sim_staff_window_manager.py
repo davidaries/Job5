@@ -118,7 +118,6 @@ class home_screen:
         self.staff_dict[device_id].set_home()
         self.staff_dict[device_id].poll_controller()
 
-
     def add_home(self, home):
         """Sets a reference to home_screen that is later passed to the staffer windows so data can be sent back to
         home_screen module, which has a connection with the controller module
@@ -143,5 +142,10 @@ class home_screen:
         :type data_return: list"""
         working_data.return_completion(token, data_return)
 
-    def reset_staffer_home(self, device_id):
+    def log_and_reset(self, device_id, action, log_input, token):
+        log_data = log_input.get(1.0, "end-1c")  # after some basic reserch on using text boxes in tkinter end-1c is the way
+                                          # retrieve all of the text from a textbox
+        working_data.add_to_log(token,action+': \n'+log_data)
+        self.staff_dict.get(device_id).clear_widgets()
+        # ic(working_data.get_log(token))
         self.staff_dict.get(device_id).refresh_home()

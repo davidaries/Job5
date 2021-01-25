@@ -77,7 +77,8 @@ class manage_window:
         self.home = home
         # self.log_window = log
         self.window = window
-        self.window.bind('<Return>', lambda event: self.return_input_listener())  # binds Return key to submit button
+        # self.window.bind('<Return>', lambda event: self.return_input_listener())  # binds Return key to submit button
+        self.window.unbind('<Return>')
         self.working_token = None
         # self.sim_time = sim_time
         self.staff_name = staffer.get('~1')
@@ -116,7 +117,7 @@ class manage_window:
                 if task not in self.token_list and task not in self.tokens_completed:
                     self.token_start_time[task] = tasks.get(task)[6]
                     if self.at_home:
-                        ic(tasks.get(task))
+                        # ic(tasks.get(task))
                         self.send_data(task, tasks.get(task))
                 if task not in self.token_list and task not in self.tokens_completed:
                     self.token_list.append(task)
@@ -183,7 +184,19 @@ class manage_window:
         self.row_current += 1
 
     def view_log_data(self, token):
-        print(token)
+        def close():
+            log_screen.destroy()
+        log_screen = Toplevel(self.root)
+        log_screen.geometry(self.window.geometry())
+        try:
+            for data in working_data.get_log(token):
+                Label(log_screen, text=data, font = self.widget_creator.larger_font,
+                      wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
+        except:
+            Label(log_screen, text='NO LOG DATA',font = self.widget_creator.larger_font).pack(side = TOP, anchor = NW)
+        Button(log_screen, text = ld.get_text_from_dict(self.language,'~54'), command = close,
+                fg="black", bg="gray", height=1, width=10
+               ).pack(side = BOTTOM)
 
     def set_home(self):
         """This function sets up the home screen for the staffer"""
@@ -395,3 +408,6 @@ class manage_window:
             else:
                 if len(widget[1].get()) > 0:
                     self.add_value(widget[0], widget[1].get())
+
+    def clear_widgets(self):
+        self.widget_creator.clear_widget_data()

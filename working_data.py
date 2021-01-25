@@ -28,8 +28,8 @@ def return_completion(token, data_return):
 
 def add_to_log(token, txt):
     # basic log addition
-    ic(token)
-    ic(txt)
+    # ic(token)
+    # ic(txt)
     if token in log_dict:
         log_dict.get(token).append(txt)
     else:

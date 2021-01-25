@@ -7,6 +7,7 @@ def get_staff_type(protocol, step):  # get the staff_type who is responsible for
     return staffer_type
 
 
+# when we are getting a staffer with this still give a staffer who is trying to reassign a task
 def get_staffer(staff_type):  # get the staffer who is responsible for the step in the protocol
     for s in ild.staffers:  # currently gets the first staffer who matches on staff_type, much more to be done!
         if ild.staffers[s]['~23'] == staff_type:
