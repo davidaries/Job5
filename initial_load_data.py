@@ -14,17 +14,12 @@ p0001 = {      # this is what protocol p0001 with its four steps will look like 
         ('ModifyEntry', '~16'), ('Button', '~20')), None, ({'call': [['p0001', 2, 3]]})],
     2: ['st_1', '~35', 'UI', ('PersonHeader', 'TaskHeader',
         ('EmptyEntry', '~19'), ('DropDown', '~17', 'c117'), ('Button', '~20')), None, ({'call': [['p0001', 3, 3]]})],
-    # 3: ['st_1', '~36', 'UI', ('PersonHeader', 'TaskHeader',
-    #     ('Fixed', '~17'), ('DropDown', '~2', 'c102'), ('Button', '~20')), None, ({'call': [['p0001', 4, 3]]})],
-    # 4: ['st_1', '~18', 'UI', ('PersonHeader', 'TaskHeader',
-    #     ('Fixed', '~2'), ('CheckBoxes', '~18', 'c118'), ('Button', '~20')), None, ({})]
     3: ['st_1', 'calc BMI', 'murphy', 'murphy005', None, ({'call': [['p0001', 4, 3]]})],
-    4: ['st_1', 'calc BMI', 'murphy', 'murphy005', None, ({'call': [['p0001', 5, 3]]})],
+    4: ['st_1', 'diabetes screen', 'decisioning', 'BMI_d1', None, ({'call': [['p0001', 5, 3]]})],
     5: ['st_1', '~36', 'UI', ('PersonHeader', 'TaskHeader',
         ('Fixed', '~17'), ('DropDown', '~2', 'c102'), ('Button', '~20')), None, ({'call': [['p0001', 6, 3]]})],
     6: ['st_1', '~18', 'UI', ('PersonHeader', 'TaskHeader',
                               ('Fixed', '~2'), ('CheckBoxes', '~18', 'c118'), ('Button', '~20')), None, ({})]
-    # 7: ['st_1', 'diabetes screen', 'decision', 'spec', None, ()]
     }
 
 p0002 = {      # this is what protocol p0001 with its four steps will look like when loaded from the table
@@ -51,13 +46,16 @@ choices = {    # What to display in UI as choices. True appears in short list, F
 
 # STAFFING RELATED TABLE DATA ###############################################################
 p0001_staff = {     # assigning a staff type to each step in protocol p0001
-    # 1: '~24', 2: '~25', 3: '~26', 4: '~27'
-    # 1: '~24', 2: '~25', 4: '~26', 5: '~27'
     1: '~24', 2: '~25', 5: '~26', 6: '~27'
     }
 
+p0002_staff = {     # assigning a staff type to each step in protocol p0001
+    1: '~27'
+    }
+
 protostep_staff = {     # putting the staff type assignments for protocol p0001 into the protostep_staff  dictionary
-    'p0001': p0001_staff
+    'p0001': p0001_staff,
+    'p0002': p0002_staff
     }
 
 staffers = {                # a primitive dictionary for staffers that will do for now

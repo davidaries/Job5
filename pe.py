@@ -6,7 +6,7 @@ import initial_load_data as ild
 import working_data as wd
 import get_responsible_staff as grs
 import murphy
-
+import decisioning
 import simulation_time as sim_time
 
 # global sim_time
@@ -87,8 +87,6 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
     global sim_time
     pdata_appendums = []
     calls_list = []
-    pe_int_calls = []
-    pe_ext_calls = []
 
     if pe_ins_sol:  # solicited inputs
         while pe_ins_sol:
@@ -175,17 +173,38 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
                 pdata.append(pdata_appendum)   # append to pdata
                 datas_expansion(person, entity, pdatm, datas['data'][0])  # now we need to call the expansion to adat
                 # now, time to think routing: where do I find that - where it specifies step 4?
+                print('this is the call:', ild.protocols[proto_][step_][5])
                 calls_from_murphy = ild.protocols[proto_][step_][5].get('call')
                 if calls_from_murphy:
                     for call_fm in calls_from_murphy:
                         call_type_fm = ild.protocols[call_fm[0]][call_fm[1]][2]
                         if call_type_fm == 'UI':
                             process_call_for_pe_queues(call_fm, pdata_appendum, pe_outs, pe_waits)
-                        elif call_type_fm == 'murphy':
+                        elif call_type_fm in ['murphy', 'decisioning']:
                             calls_list.append([call_fm, pdata_appendum, pe_outs, pe_waits])
             elif call_type == 'UI':
                 process_call_for_pe_queues(call[0], call[1], call[2], call[3])
             elif call_type == 'decisioning':
-                pass
+                existing_calls_for_step = ild.protocols[proto_][step_][5].get('call')
+                decision_spec = ild.protocols[proto_][step_][3]
+                decided_ = decisioning.decision(person, decision_spec)
+                print(decided_)
+                if decided_:
+                    decided = decided_.get('call')[0]
+                    print(ild.protocols[proto_][step_])
+                    try:
+                        existing_calls_for_step.append(decided)
+                    except:
+                        existing_calls_for_step = decided
+                new_flows = existing_calls_for_step
+                print(new_flows)
+                for new_flow in new_flows:
+                    calls_list.append([new_flow, pdata_appendum, pe_outs, pe_waits])
+                # if there is an existing call, append, otherwise create
+                # need to run this -- decide(person, decision_spec):
+                # then using what come back, need to ask here what is the next thing to do - depending on the next step
+                # and it needs to be a possible append (in case there is already a flow step specfied)
+
+
             else:
                 pass

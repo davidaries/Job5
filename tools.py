@@ -17,8 +17,8 @@ def summary():
     for j in working_data.pe_waits:
         print(j, working_data.pe_waits[j])
 
-    print('\nadats =', ild.adat)
-    for i in ild.adat:
+    print('\nadats =', working_data.adat)
+    for i in working_data.adat:
         print('person = ', i)
-        for ii in ild.adat[i]:
-            print('  ', ii, ild.adat[i][ii])
+        for ii in working_data.adat[i]:
+            print('  ', ii, working_data.adat[i][ii])
