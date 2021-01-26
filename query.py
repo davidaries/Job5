@@ -24,10 +24,10 @@ Didn't specify a explicit way to do "all" - for now just specify a really early 
 """
 
 import initial_load_data as ild   # query needs to be able to access the data in adat (currently found in initial_load_data.py)
-
+import working_data as wd
 
 def adat_person_key(person, key):   # this query by default returns only the latest (most recent) value for the key
-    adat = ild.adat
+    adat = wd.adat
     values = adat[person].get(key)
     if not values:
         return []
@@ -35,7 +35,7 @@ def adat_person_key(person, key):   # this query by default returns only the lat
 
 
 def adat_person_key_options(person, key, last=None, earliest=None, latest=None):  # this query overs options
-    adat = ild.adat
+    adat = wd.adat
     values = adat[person].get(key)
     if not values:
         return []

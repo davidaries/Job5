@@ -95,8 +95,10 @@ def murmkv004(values):  # receive weight and height and calculate BMI
 def murphy005(person):  # receive person and calculate BMI
     person = person[1:-1]  # the convoluted mess coming in needs this
     a, b = query.adat_person_key(person, '~19')[1], query.adat_person_key(person, '~45')[1]
+    a, b = float(a), float(b)
     result = round(a / b ** 2, 1)
-    return result
+    datas = eval("{'data': [{'k': '~47', 'v': " + str(result) + ", 'vt': 'f', 'units': None}]}")   # eval of the concatenated text string was essential
+    return datas
 
 
 """Other possible murphy ideas
