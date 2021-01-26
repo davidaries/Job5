@@ -132,13 +132,19 @@ class manage_window:
         display_t_diff = sim_time.get_time_difference(self.token_start_time.get(token))
         self.token_time_label.get(token).config(text=display_t_diff)
 
+    def clear_token(self, token):
+        self.token_list.remove(token)
+        self.token_start_time.pop(token)
+        self.token_time_label.pop(token)
+        # self.tokens_completed.remove(token)
+
     def refresh_home(self):
         """This function simply refreshes the staffers home screen after completing a task"""
         tasks = self.home.get_tasks(self.device_id)
         self.at_home = True
+        self.clear_window()
+        self.set_home()
         if tasks:
-            self.clear_window()
-            self.set_home()
             self.token_time_label.clear()
             for token in self.token_list:
                 self.send_data(token, tasks.get(token))
@@ -189,7 +195,7 @@ class manage_window:
         log_screen = Toplevel(self.root)
         log_screen.geometry(self.window.geometry())
         try:
-            for data in working_data.get_log(token):
+            for data in working_data.log_dict.get(token):
                 Label(log_screen, text=data, font = self.widget_creator.larger_font,
                       wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
         except:
@@ -242,7 +248,11 @@ class manage_window:
         label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font,
                                fg=priority_color.get(priority))
         label_priority.grid(column=0, row=self.row_current)
-        label_status = Label(self.window, text=ld.get_text_from_dict(self.language, '~48')
+        if token in working_data.token_status_dict:
+            status = working_data.token_status_dict.get(token)
+        else:
+            status = '~55'
+        label_status = Label(self.window, text=ld.get_text_from_dict(self.language, status)
                              #####CHANGE TO GET ACTUAL STATUS
                              , font=self.widget_creator.medium_font)
         label_status.grid(column=1, row=self.row_current)

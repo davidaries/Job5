@@ -3,6 +3,7 @@ import time
 from icecream import ic
 
 time_label = None
+root = None
 opening_time = datetime.datetime(2021, 1, 9, 7, 0, 0)
 is_paused = False
 current_time = opening_time
@@ -10,7 +11,7 @@ pause_time = opening_time
 
 
 def stop_clock(val):
-    global is_paused,pause_time
+    global is_paused, pause_time
     is_paused = val
     pause_time = time.perf_counter()
 
@@ -35,13 +36,19 @@ def convert_time(seconds):
     return "%d:%02d" % (hour, minutes)
 
 
-def clock(root, time_lbl):
-    global current_time
+def clock():
+    global current_time, root, time_label
     if not is_paused:
         current_time += datetime.timedelta(seconds=60)
-        time_lbl.config(text = str(current_time))
-    root.after(1000, lambda: clock(root,time_lbl))
+        time_label.config(text=str(current_time))
+    root.after(1000, clock)
 
 
 def pause():
     return is_paused
+
+
+def set_ui_tools(rt, timelbl):
+    global root, time_label
+    root = rt
+    time_label = timelbl

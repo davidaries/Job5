@@ -3,8 +3,10 @@
 import datetime
 import random
 import initial_load_data as ild
+import working_data as wd
 import get_responsible_staff as grs
 import murphy
+
 import simulation_time as sim_time
 
 # global sim_time
@@ -70,9 +72,9 @@ def datas_expansion(person, entity, parent, datum):
     event_dts = sim_time.get_time_stamp()   # someday beyond more complex for microbio etc.
     adat_ = [person, k, [adatm, entity, parent, vt, v, units, event_dts]]
     try:
-        ild.adat[adat_[0]][adat_[1]].append(adat_[2])
+        wd.adat[adat_[0]][adat_[1]].append(adat_[2])
     except:
-        ild.adat[adat_[0]][adat_[1]] = [adat_[2]]
+        wd.adat[adat_[0]][adat_[1]] = [adat_[2]]
 # ### END - function to add to adat from pdata with relevant data #####
 
 

@@ -1,3 +1,4 @@
+import random
 from tkinter import *
 from sim_staff_window import manage_window
 import initial_load_data as ild
@@ -7,7 +8,7 @@ import working_data
 from icecream import ic
 
 
-class home_screen:
+class sim_staff_window_manager:
     """The home_screen class is in charge of creating and managing the home screens for the various staffers
     based on the different kinds of staff windows, the handling of the person populated on their task list
     will be done based on their job type in manage_window module
@@ -79,6 +80,7 @@ class home_screen:
     def login_screen(self):
         """This function creates the login screen for the various staffer by making calls to the login_manager
         module"""
+        ic(working_data.pe_outs.keys())
         window = self.create_home_screen()
         login_manager = lm(self.root, '~101', self.home, window)
         login_manager.add_entry_id()
@@ -93,6 +95,10 @@ class home_screen:
             window = self.create_home_screen()
             staff_info = ild.staffers.get(staff)
             device_id = ild.staff_device.get(staff)
+            # ic(device_id)
+            ####THIS WILL NEED TO BE REPLACED WITH A BETTER WAY FOR CREATING
+            # if device_id not in working_data.pe_outs.keys():
+            #     working_data.pe_outs[device_id] = {}
             ild.staffer_login_info.get(staff).__setitem__(1, True)
             self.staff_dict[device_id] = manage_window(window, staff_info,
                                                        device_id, self.root, self.home)
@@ -109,6 +115,7 @@ class home_screen:
         :type staffer_id: str
         :param window: a reference to the associated tkinter window
         :type window: tk window"""
+
         device_id = ild.staff_device.get(staffer_id)
         staff_info = ild.staffers.get(staffer_id)
         self.staff_dict[device_id] = manage_window(window, staff_info,
@@ -132,7 +139,7 @@ class home_screen:
         :type device_id: str"""
         # ic(device_id)
         # ic(working_data.pe_outs.get(device_id))
-        return working_data.get_pe_outs(device_id)
+        return working_data.pe_outs.get(str(device_id))
 
     def return_data(self, token, data_return):
         """This function sends the appropriate data for the token in question to be processed by the controller
@@ -140,12 +147,18 @@ class home_screen:
         :type token: int
         :param data_return: list of the corresponding data for the token
         :type data_return: list"""
-        working_data.return_completion(token, data_return)
+        if token:
+            working_data.pe_ins_sol.append([token, simulation_time.get_time_stamp(),
+                               {'data': data_return}])
+        # return_completion(token, data_return)
 
-    def log_and_reset(self, device_id, action, log_input, token):
-        log_data = log_input.get(1.0, "end-1c")  # after some basic reserch on using text boxes in tkinter end-1c is the way
-                                          # retrieve all of the text from a textbox
-        working_data.add_to_log(token,action+': \n'+log_data)
+    def reset_window(self, device_id):
         self.staff_dict.get(device_id).clear_widgets()
         # ic(working_data.get_log(token))
         self.staff_dict.get(device_id).refresh_home()
+
+    def change_staff_for_task(self, token, old_staff, new_staff):
+        pe_out = working_data.pe_outs[str(old_staff)].pop(token)
+        self.staff_dict.get(old_staff).clear_token(token)
+        self.reset_window(old_staff)
+        working_data.pe_outs.get(str(new_staff))[token] = pe_out
