@@ -1,15 +1,17 @@
 import language_dictionary as ld
 from tkinter import *
 from tkinter import font as tk_font
+import tkinter as tk
 import initial_load_data as ild
 import query
+from icecream import ic
 
 
 class widgets:
 
     def __init__(self, root, language, window=None):
         self.language = language
-        # self.home = home
+        self.root = root
         self.window = window
         self.medium_font = tk_font.Font(root=root.master, family='Helvetica', size=10, weight=tk_font.BOLD)
         self.larger_font = tk_font.Font(root=root.master, family='Helvetica', size=10, weight=tk_font.BOLD)
@@ -19,6 +21,7 @@ class widgets:
         self.task_row = 0
         self.widgets = []
         self.login_widgets = []
+        self.priority = tk.IntVar
 
     def return_widget_data(self):
         return self.widgets
@@ -160,3 +163,41 @@ class widgets:
     def clear_widget_data(self):
         """This function clears all widgets currently present on the screen"""
         self.widgets.clear()
+
+    def priority_radio_buttons(self, priority):
+        pri = IntVar
+        self.priority = pri
+
+        # def selected():
+        #     ic(self.priority.get())
+        #
+        # values = {"1": 1,
+        #           "2": 2,
+        #           "3": 3}
+        # col = 1
+        # for (text, value) in values.items():
+        #     print('asdfjkh asdjlkhfaldsfjhk')
+        #     r = tk.Radiobutton(self.window, text=text, variable=self.priority,
+        #                 value=value, command = selected)
+        #     r.grid(row=self.task_row + 2, column=col, sticky='W')
+        #     col+=1
+        #
+        pri_lbl = Label(self.window, text=ld.get_text_from_dict(self.language, '~49') + ':', font=self.medium_font)
+        pri_radio_1 = tk.Radiobutton(self.window, text='1', fg="red", variable=self.priority, value=1)
+        pri_radio_2 = tk.Radiobutton(self.window, text='2', fg="blue", variable=self.priority, value=2)
+        pri_radio_3 = tk.Radiobutton(self.window, text='3', fg="black", variable=self.priority, value=3)
+        pri_lbl.grid(row=self.task_row + 1, column=0, sticky='W')
+        pri_radio_1.grid(row=self.task_row + 1, column=1, sticky='W')
+        pri_radio_2.grid(row=self.task_row + 1, column=2, sticky='W')
+        pri_radio_3.grid(row=self.task_row + 1, column=3, sticky='W')
+        if priority == 1:
+            pri_radio_1.invoke()
+        elif priority == 2:
+            pri_radio_2.invoke()
+        else:
+            pri_radio_3.invoke()
+
+
+
+    def get_priority(self):
+        return self.priority

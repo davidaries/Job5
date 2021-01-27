@@ -73,14 +73,13 @@ class sim_staff_window_manager:
             self.vertical_spacing += 350
             self.horizontal_spacing = 0
         screen = Toplevel(self.root)
-        screen.geometry("480x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
+        screen.geometry("490x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
         self.horizontal_spacing += 500
         return screen
 
     def login_screen(self):
         """This function creates the login screen for the various staffer by making calls to the login_manager
         module"""
-        ic(working_data.pe_outs.keys())
         window = self.create_home_screen()
         login_manager = lm(self.root, '~101', self.home, window)
         login_manager.add_entry_id()
@@ -95,10 +94,6 @@ class sim_staff_window_manager:
             window = self.create_home_screen()
             staff_info = ild.staffers.get(staff)
             device_id = ild.staff_device.get(staff)
-            # ic(device_id)
-            ####THIS WILL NEED TO BE REPLACED WITH A BETTER WAY FOR CREATING
-            # if device_id not in working_data.pe_outs.keys():
-            #     working_data.pe_outs[device_id] = {}
             ild.staffer_login_info.get(staff).__setitem__(1, True)
             self.staff_dict[device_id] = manage_window(window, staff_info,
                                                        device_id, self.root, self.home)
@@ -133,32 +128,11 @@ class sim_staff_window_manager:
         """
         self.home = home
 
-    def get_tasks(self, device_id):
-        """This function returns the current list of tasks for a staffer based on their device_id
-        :param device_id: a unique id for the staffers device
-        :type device_id: str"""
-        # ic(device_id)
-        # ic(working_data.pe_outs.get(device_id))
-        return working_data.pe_outs.get(str(device_id))
 
-    def return_data(self, token, data_return):
-        """This function sends the appropriate data for the token in question to be processed by the controller
-        :param token: unique token id used for tasks
-        :type token: int
-        :param data_return: list of the corresponding data for the token
-        :type data_return: list"""
-        if token:
-            working_data.pe_ins_sol.append([token, simulation_time.get_time_stamp(),
-                               {'data': data_return}])
-        # return_completion(token, data_return)
 
-    def reset_window(self, device_id):
+
+
+    def reset_window(self, device_id, token):
         self.staff_dict.get(device_id).clear_widgets()
-        # ic(working_data.get_log(token))
+        self.staff_dict.get(device_id).clear_token(token)
         self.staff_dict.get(device_id).refresh_home()
-
-    def change_staff_for_task(self, token, old_staff, new_staff):
-        pe_out = working_data.pe_outs[str(old_staff)].pop(token)
-        self.staff_dict.get(old_staff).clear_token(token)
-        self.reset_window(old_staff)
-        working_data.pe_outs.get(str(new_staff))[token] = pe_out
