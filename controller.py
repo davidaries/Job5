@@ -26,7 +26,7 @@ def simulate():
     if not simulation_time.pause():
         # Now let's run the protocol engine
         pe.protocol_engine(wd.pe_ins_sol, wd.pe_waits, wd.pe_ins_unsol,
-                           wd.pe_outs, wd.pdata, wd.adat)
+                           wd.pe_outs, wd.pdata)
         check_entrant()
     simulation_time.root.after(1000, simulate)
 
@@ -58,9 +58,3 @@ def return_completion(token, data_return):
     if token:
         wd.pe_ins_sol.append([token, simulation_time.get_time_stamp(), {
             'data': data_return}])  ########################################## ? data as ild?
-
-# START - PRINTING CURRENT DATA STATUS - ONLY FOR REVIEW/TROUBLESHOOTING ##########
-
-######THIS NOW HAPPENS IN TOOLS########
-
-# ### END - PRINTING CURRENT DATA STATUS - ONLY FOR REVIEW/TROUBLESHOOTING ##########
