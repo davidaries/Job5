@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import language_dictionary as ld
 from tkinter import *
 from tkinter import font as tk_font
@@ -21,7 +23,7 @@ class widgets:
         self.task_row = 0
         self.widgets = []
         self.login_widgets = []
-        self.priority = tk.IntVar
+        self.priority = IntVar()
 
     def return_widget_data(self):
         return self.widgets
@@ -164,24 +166,29 @@ class widgets:
         """This function clears all widgets currently present on the screen"""
         self.widgets.clear()
 
-    def priority_radio_buttons(self, priority):
-        pri = IntVar
-        self.priority = pri
+    def log_window_header(self, window):
+        Label(window, text=ld.get_text_from_dict(self.language, '~57'), font=self.medium_font).grid(row=0, column=0,
+                                                                                                    ipadx=15, sticky=W)
+        Label(window, text=ld.get_text_from_dict(self.language, '~10'), font=self.medium_font).grid(row=0, column=1,
+                                                                                                    ipadx=15, sticky=W)
+        Label(window, text=ld.get_text_from_dict(self.language, '~58'), font=self.medium_font).grid(row=0, column=2,
+                                                                                                    ipadx=15, sticky=W)
+        Label(window, text=ld.get_text_from_dict(self.language, '~49'), font=self.medium_font).grid(row=0, column=3,
+                                                                                                    ipadx=15, sticky=W)
+        Label(window, text=ld.get_text_from_dict(self.language, '~59'), font=self.medium_font).grid(row=0, column=4,
+                                                                                                    ipadx=15, sticky=W)
 
-        # def selected():
-        #     ic(self.priority.get())
-        #
-        # values = {"1": 1,
-        #           "2": 2,
-        #           "3": 3}
-        # col = 1
-        # for (text, value) in values.items():
-        #     print('asdfjkh asdjlkhfaldsfjhk')
-        #     r = tk.Radiobutton(self.window, text=text, variable=self.priority,
-        #                 value=value, command = selected)
-        #     r.grid(row=self.task_row + 2, column=col, sticky='W')
-        #     col+=1
-        #
+    def display_log_info(self, window, data, r):
+        user = ild.staffers[data.get('user')].get('~1')
+        time = datetime.fromtimestamp(int(data.get('time'))).strftime('%H:%M')
+        status = ld.get_text_from_dict(self.language, data.get('status'))
+        Label(window, text=user, font=self.medium_font).grid(row=r, column=0)
+        Label(window, text=time, font=self.medium_font).grid(row=r, column=1)
+        Label(window, text=status, font=self.medium_font).grid(row=r, column=2)
+        Label(window, text=data.get('priority'), font=self.medium_font).grid(row=r, column=3)
+        Label(window, text=data.get('comments'), font=self.medium_font, justify = LEFT, height=3, wraplength=190).grid(row=r, column=4)
+
+    def priority_radio_buttons(self, priority):
         pri_lbl = Label(self.window, text=ld.get_text_from_dict(self.language, '~49') + ':', font=self.medium_font)
         pri_radio_1 = tk.Radiobutton(self.window, text='1', fg="red", variable=self.priority, value=1)
         pri_radio_2 = tk.Radiobutton(self.window, text='2', fg="blue", variable=self.priority, value=2)
@@ -196,8 +203,6 @@ class widgets:
             pri_radio_2.invoke()
         else:
             pri_radio_3.invoke()
-
-
 
     def get_priority(self):
         return self.priority

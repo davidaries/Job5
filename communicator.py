@@ -1,13 +1,14 @@
 import initial_load_data as ild
 import simulation_time
 import working_data as wd
+
 from icecream import ic
 
 
-def write_to_log(token, device_id, status, comments, priority):
+def update_log(token, device_id, status, comments, priority):
     time = simulation_time.get_time_stamp()
     user = ild.device_staff.get(device_id)
-    priority = priority
+    wd.pe_outs.get(str(device_id))[token][2]=priority# only changes for token, not sure how to update pe with this info
     log_data = {'user': user, 'time': time, 'status': status, 'priority': priority, 'comments': comments}
     if token in wd.log_dict:
         wd.log_dict.get(token).append(log_data)
@@ -21,7 +22,7 @@ def change_staffer(token, current_staffer, alternate_staffer):
         new_staff_device = ild.staff_device.get(alternate_staffer.get())
     except:
         new_staff_device = ild.staff_device.get(alternate_staffer)
-    ic(new_staff_device)
+    # ic(new_staff_device)
     wd.pe_waits.get(token)[0] = str(new_staff_device)
     pe_out = wd.pe_outs[str(current_staffer)].pop(token)
     wd.pe_outs.get(str(new_staff_device))[token] = pe_out
@@ -38,7 +39,7 @@ def return_data(token, data_return):
         flow_info = wd.flow_data.get(token)
     wd.pe_ins_sol.append([token, simulation_time.get_time_stamp(),
                           {'data': data_return, 'log': wd.log_dict.get(token), 'flow': flow_info}])
-    ic(wd.pe_ins_sol)
+    # ic(wd.pe_ins_sol)
     # keep expanding on this dictionary to include final log and flow
 
 

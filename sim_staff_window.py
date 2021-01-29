@@ -1,3 +1,4 @@
+from datetime import datetime
 from tkinter import *
 import language_dictionary as ld
 import query
@@ -193,17 +194,24 @@ class manage_window:
     def view_log_data(self, token):
         def close():
             log_screen.destroy()
+
         log_screen = Toplevel(self.root)
         log_screen.geometry(self.window.geometry())
+        log_row = 1
+        self.widget_creator.log_window_header(log_screen)
         try:
             for data in working_data.log_dict.get(token):
-                Label(log_screen, text=data, font = self.widget_creator.larger_font,
-                      wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
+                self.widget_creator.display_log_info(log_screen, data, log_row)
+                log_row += 1
+                # ic(data.get('user'))
+                # ic(data)
+                # Label(log_screen, text=data, font = self.widget_creator.larger_font,
+                #       wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
         except:
-            Label(log_screen, text='NO LOG DATA',font = self.widget_creator.larger_font).pack(side = TOP, anchor = NW)
-        Button(log_screen, text = ld.get_text_from_dict(self.language,'~54'), command = close,
-                fg="black", bg="gray", height=1, width=10
-               ).pack(side = BOTTOM)
+            Label(log_screen, text='NO LOG DATA', font=self.widget_creator.larger_font).grid(row=0, column=0)
+        Button(log_screen, text=ld.get_text_from_dict(self.language, '~54'), command=close,
+               fg="black", bg="gray", height=1, width=10
+               ).grid(sticky=S)
 
     def set_home(self):
         """This function sets up the home screen for the staffer"""
@@ -259,7 +267,12 @@ class manage_window:
                            font=self.widget_creator.medium_font)  # will be actual time
         self.token_time_label[token] = label_time
         label_time.grid(column=2, row=self.row_current)
-        label_repost_time = Label(self.window, text='RPT', font=self.widget_creator.medium_font)
+
+        try:
+            rpt = datetime.fromtimestamp(int(working_data.log_dict.get(token)[-1].get('time'))).strftime('%H:%M')
+        except:
+            rpt = 'RPT'
+        label_repost_time = Label(self.window, text=rpt, font=self.widget_creator.medium_font)
         label_repost_time.grid(column=3, row=self.row_current)
         label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
                            font=self.widget_creator.medium_font)
@@ -296,9 +309,8 @@ class manage_window:
                 self.widget_creator.add_check_boxes(item[1:])
             elif item[0] == 'Button':
                 self.add_button_submit(item[1])
-        self.log_int.create_buttons(self.widget_creator.task_row, token, priority)
-        #####THIS WILL GO SOMEWHERE ELSE EVENTUALLY##### PRIORITY
         self.widget_creator.priority_radio_buttons(priority)
+        self.log_int.create_buttons(self.widget_creator.task_row, token, self.widget_creator.get_priority())
 
     def clear_window(self):
         """This function clears the window that it is given allowing it to be a blank canvas before the window

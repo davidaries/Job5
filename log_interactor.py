@@ -18,7 +18,6 @@ class log_interactor:  # rename to task_reassign
         self.priority = None
 
     def create_buttons(self, row, token, priority):
-        ic(priority)
         self.priority = priority
         for _ in range(3):  # space buttons need to figure out a better way to do this
             row += 1
@@ -53,6 +52,7 @@ class log_interactor:  # rename to task_reassign
         # btn_drop.config(state = tk.DISABLED)
 
     def pause_btn_listener(self, token):
+        self.staff_change = False
         log_input = 'N/A'
         self.log_and_reset(self.device_id, '~6', log_input, token)
 
@@ -72,14 +72,17 @@ class log_interactor:  # rename to task_reassign
         self.alternate_staff = grs.get_other_staffers(staff_type, current_staffer, False)
 
     def return_btn_listener(self, token):
+        self.staff_change = False
         communicator.add_flow_info(token,'~8')
         self.log_textbox('~8', token)
 
     def skip_btn_listener(self, token):
+        self.staff_change = False
         communicator.add_flow_info(token,'~52')
         self.log_textbox('~52', token)
 
     def drop_btn_listener(self, token):
+        self.staff_change = False
         communicator.add_flow_info(token,'~53')
         self.log_textbox('~53', token)
 
@@ -95,11 +98,9 @@ class log_interactor:  # rename to task_reassign
             comments = log_input.get(1.0,"end-1c")
         except: #when log_input comes from a string
             comments = log_input
-
+        communicator.update_log(token, device_id, status, comments, self.priority.get())
         if self.staff_change:
             communicator.change_staffer(token, self.device_id, self.alternate_staff)
-        ic(self.priority)
-        communicator.write_to_log(token, device_id, status, comments, self.priority)
 
         self.home.reset_window(self.device_id, token)
 
