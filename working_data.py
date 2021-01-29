@@ -20,6 +20,7 @@ pe_outs['543'] = {}
 
 log_dict = {}
 token_status_dict ={}
+flow_data = {}
 
 
 adat = {

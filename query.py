@@ -23,40 +23,66 @@ Okay - earliest and latest functionality added
 Didn't specify a explicit way to do "all" - for now just specify a really early earliest (e.g., 1) would work
 """
 
-import initial_load_data as ild   # query needs to be able to access the data in adat (currently found in initial_load_data.py)
+import \
+    initial_load_data as ild  # query needs to be able to access the data in adat (currently found in initial_load_data.py)
 import working_data as wd
 
-def adat_person_key(person, key):   # this query by default returns only the latest (most recent) value for the key
+
+def adat_person_key(person, key):
+    """ this query by default returns only the latest (most recent) value for the key for the person
+
+    :param person: the person to get the value for
+    :type person: str
+    :param key: the key to get the value for
+    :type key: str
+    :return: list[timestamp, value, value type]
+    """
     adat = wd.adat
     values = adat[person].get(key)
     if not values:
-        return []
+        return []      # if no values returns an empty list
     return [values[-1][6], values[-1][4], values[-1][5]]
 
 
-def adat_person_key_options(person, key, last=None, earliest=None, latest=None):  # this query overs options
+def adat_person_key_options(person, key, last=None, earliest=None, latest=None):
+    """ this query by returns values for the key for the person by options of how many and/or earliest and latest
+
+    :param person: the person to get the value for
+    :type person: str
+    :param key: the key to get the value for
+    :type key: str
+    :param last: how many values to return (starting with most recent)
+    :type last: int
+    :param earliest: earliest datetimestamp for a value to return
+    :type earliest: float
+    :param latest: latest datetimestamp for a value to return
+    :type latest: float
+    :return: list of lists, each internal list as [timestamp, value, value type]
+    """
     adat = wd.adat
     values = adat[person].get(key)
     if not values:
-        return []
+        return []        # if no values returns an empty list
     valued = []
-    if last:   # if last it will return up to that number. And if len(values) < last it will return all values
+    if last:  # it will return up to that number. If len(values) < last it will return all values, however many.
         last_values = values[-last:]
         for each in last_values:
             valued.append([each[6], each[4], each[5]])
     else:
         for each in values:
             valued.append([each[6], each[4], each[5]])
-    if earliest:    # if earliest it will only return values with times > earliest
+    # Note: earliest and latest do operate on the output of latest if it was specified
+    if earliest:  # if earliest it will only return values with times > earliest
         valued_in = tuple(valued)
         valued = []
         for each in valued_in:
             if each[0] > earliest:
                 valued.append(each)
-    if latest:      # if latest it will only return values with times < latest
+    if latest:  # if latest it will only return values with times < latest
         valued_in = tuple(valued)
         valued = []
         for each in valued_in:
             if each[0] < latest:
                 valued.append(each)
-    return valued   # returns value after last, earliest, latest have all had the chance to filter the values
+    return valued  # returns value after last, earliest, latest have all had the chance to filter the values
+

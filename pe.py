@@ -1,5 +1,7 @@
-# pe.py
+""" pe.py is the protocol engine, it is heart of keeping things happening within protocols, going step by step,
+    and sometimes forking or branching or passing along to other protocols.
 
+"""
 import datetime
 import random
 import initial_load_data as ild
@@ -8,29 +10,38 @@ import get_responsible_staff as grs
 import murphy
 import decisioning
 import simulation_time as sim_time
+from icecream import ic
 
-# global sim_time
-#
-#
-# def set_sim_time(s_time):
-#     """This function creates a reference to the simulation time module used for reporting current simulatio time
-#     :param s_time: a reference to the system_time module
-#     :type s_time: module"""
-#     global sim_time
-#     sim_time = s_time
 
-# START - function to process the calls for UI (or other external agent)  ######
+# START - functions to process the calls for UI (or other external agent)  ######
 def process_call_for_pe_queues(call, pdata_appendum, pe_outs, pe_waits):
+    """ Process calls to made to UI (and perhaps in future to external agents)
+
+    :param call:
+    :type call:
+    :param pdata_appendum:
+    :type pdata_appendum:
+    :param pe_outs:
+    :type pe_outs:
+    :param pe_waits:
+    :type pe_waits:
+    :return:
+    """
     pe_out, pe_wait = create_pe_queues_additions(pdata_appendum, call)  # call function to get pe_out & pe_wait
     pe_outs[pe_out[0]][pe_out[1]] = pe_out[2]    # this adds the new pe_out to pe_outs
     if pe_wait[1]:    # this if because without it when a protocol ended we'd get a empty pe_wait written anyway
         pe_waits[pe_wait[0]] = pe_wait[1]        # this adds the new pe_wait to pe_waits
 
-# ### END - function to process the calls for UI (or other external agent)  ######
 
-# START - function to create a pe_out and a pe_wait - called by process_call_for_pe_queues and is part of PE #####
 def create_pe_queues_additions(pdata_appendum, protostep):
-    # global sim_time
+    """ called by process_call_for_pe_queues to create the additions for two pe queues: pe_out and pe_wait
+
+    :param pdata_appendum:
+    :type pdata_appendum:
+    :param protostep:
+    :type protostep:
+    :return:
+    """
     # for reference pdata_appendum = [pdatm[0], person[1], entity[2], caller[3],
     #                                 protocol[4], step[5], thread[6], record_dts[7], datas[8]]
     protocol, step, priority = protostep[0], protostep[1], protostep[2]
@@ -58,11 +69,23 @@ def create_pe_queues_additions(pdata_appendum, protostep):
     pe_out = [device_out, token, [person, entity, priority, task, task_type, spec, time_posted, time_reposted, status, log]]
     pe_wait = [token, [device_out, log, time_posted, person, entity, caller, protocol, step, thread, flow]]
     return pe_out, pe_wait
-# ### END - function to create a pe_out and a pe_wait - called by process_call_for_pe_queues and is part of PE ####
+# ### END - functions to process the calls for UI (or other external agent)  ######
 
 
 # START - function to add to adat from pdata with relevant data #####
 def datas_expansion(person, entity, parent, datum):
+    """
+
+    :param person:
+    :type person:
+    :param entity:
+    :type entity:
+    :param parent:
+    :type parent:
+    :param datum:
+    :type datum:
+    :return:
+    """
     global sim_time
     adatm = random.randint(1001, 9999)  # this to be replaced by get global next datm call
     k = datum['k']
@@ -83,7 +106,21 @@ def datas_expansion(person, entity, parent, datum):
 # pe_ins_sol are solicted inputs, have an associated pe_wait in pe_waits, and can carry datas for writing to adat
 # pe_ins_unsol are unsolicted inputs, with a different format, no associated pe_wait, and carry no datas for adat
 
-def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
+def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata):
+    """
+
+    :param pe_ins_sol:
+    :type pe_ins_sol:
+    :param pe_waits:
+    :type pe_waits:
+    :param pe_ins_unsol:
+    :type pe_ins_unsol:
+    :param pe_outs:
+    :type pe_outs:
+    :param pdata:
+    :type pdata:
+    :return:
+    """
     global sim_time
     pdata_appendums = []
     calls_list = []
@@ -171,40 +208,29 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata, adat):
                 record_dts = sim_time.get_time_stamp()
                 pdata_appendum = [pdatm, person, entity, caller, protocol, step, thread, record_dts, datas]
                 pdata.append(pdata_appendum)   # append to pdata
-                datas_expansion(person, entity, pdatm, datas['data'][0])  # now we need to call the expansion to adat
-                # now, time to think routing: where do I find that - where it specifies step 4?
-                print('this is the call:', ild.protocols[proto_][step_][5])
-                calls_from_murphy = ild.protocols[proto_][step_][5].get('call')
-                if calls_from_murphy:
+                datas_expansion(person, entity, pdatm, datas['data'][0])  # call expansion of murphy-created to adat
+                calls_from_murphy = ild.protocols[proto_][step_][5].get('call')  # now time to think routing
+                if calls_from_murphy:   # if the murphy step had calls specified
                     for call_fm in calls_from_murphy:
-                        call_type_fm = ild.protocols[call_fm[0]][call_fm[1]][2]
+                        call_type_fm = ild.protocols[call_fm[0]][call_fm[1]][2]    # what is the call_type from murphy?
                         if call_type_fm == 'UI':
-                            process_call_for_pe_queues(call_fm, pdata_appendum, pe_outs, pe_waits)
+                            process_call_for_pe_queues(call_fm, pdata_appendum, pe_outs, pe_waits)  # send to UI process
                         elif call_type_fm in ['murphy', 'decisioning']:
-                            calls_list.append([call_fm, pdata_appendum, pe_outs, pe_waits])
-            elif call_type == 'UI':
+                            calls_list.append([call_fm, pdata_appendum, pe_outs, pe_waits])  # append here for process
+            elif call_type == 'UI':                # send to UI process
                 process_call_for_pe_queues(call[0], call[1], call[2], call[3])
             elif call_type == 'decisioning':
-                existing_calls_for_step = ild.protocols[proto_][step_][5].get('call')
-                decision_spec = ild.protocols[proto_][step_][3]
-                decided_ = decisioning.decision(person, decision_spec)
-                print(decided_)
-                if decided_:
+                existing_calls_for_step = ild.protocols[proto_][step_][5].get('call')  # get any pre-specified steps
+                decision_spec = ild.protocols[proto_][step_][3]          # get the decision spec
+                decided_ = decisioning.decision(person, decision_spec)   # get a decision: new protocol/step(s) to call
+                if decided_:                              # append the new calls of any pre-existing calls
                     decided = decided_.get('call')[0]
-                    print(ild.protocols[proto_][step_])
                     try:
                         existing_calls_for_step.append(decided)
                     except:
                         existing_calls_for_step = decided
                 new_flows = existing_calls_for_step
-                print(new_flows)
-                for new_flow in new_flows:
+                for new_flow in new_flows:                # for each call append it here.
                     calls_list.append([new_flow, pdata_appendum, pe_outs, pe_waits])
-                # if there is an existing call, append, otherwise create
-                # need to run this -- decide(person, decision_spec):
-                # then using what come back, need to ask here what is the next thing to do - depending on the next step
-                # and it needs to be a possible append (in case there is already a flow step specfied)
-
-
-            else:
+            else:                                       # at some future point there will be other call_types
                 pass

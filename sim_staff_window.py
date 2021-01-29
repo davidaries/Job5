@@ -1,3 +1,4 @@
+from datetime import datetime
 from tkinter import *
 import language_dictionary as ld
 import query
@@ -6,6 +7,7 @@ import working_data
 import simulation_time as sim_time
 import log_interactor
 from icecream import ic
+import communicator
 
 
 class manage_window:
@@ -103,15 +105,15 @@ class manage_window:
         """Returns the device id of a staffers screen"""
         return self.device_id
 
-    def return_input_listener(self):
-        """This function allows the user to hit enter to invoke the submit_btn_listener instead of having to click the
-        actual button """
-        self.submit_btn_listener()
+    # def return_input_listener(self):
+    #     """This function allows the user to hit enter to invoke the submit_btn_listener instead of having to click the
+    #     actual button """
+    #     self.submit_btn_listener()
 
     def poll_controller(self):
         """This function checks for new tasks (based on the device_id of the staffer) every second to see if the
         staffer has any new tasks to complete and populates those tasks to their home screen."""
-        tasks = self.home.get_tasks(self.device_id)
+        tasks = communicator.get_tasks(self.device_id)
         if tasks:
             for task in tasks:
                 if task not in self.token_list and task not in self.tokens_completed:
@@ -140,7 +142,7 @@ class manage_window:
 
     def refresh_home(self):
         """This function simply refreshes the staffers home screen after completing a task"""
-        tasks = self.home.get_tasks(self.device_id)
+        tasks = communicator.get_tasks(self.device_id)
         self.at_home = True
         self.clear_window()
         self.set_home()
@@ -180,7 +182,7 @@ class manage_window:
         btn_log.grid(column=5, row=self.row_current)
         btn_process: Button = Button(self.window, text=' -> ',
                                      command=lambda: self.write_task_screen(task_window_info, person_id, token,
-                                                                            task_id),
+                                                                            task_id, priority),
                                      fg="black", bg="gray")
         btn_process.grid(column=6, row=self.row_current)
         self.row_current += 1
@@ -192,17 +194,24 @@ class manage_window:
     def view_log_data(self, token):
         def close():
             log_screen.destroy()
+
         log_screen = Toplevel(self.root)
         log_screen.geometry(self.window.geometry())
+        log_row = 1
+        self.widget_creator.log_window_header(log_screen)
         try:
             for data in working_data.log_dict.get(token):
-                Label(log_screen, text=data, font = self.widget_creator.larger_font,
-                      wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
+                self.widget_creator.display_log_info(log_screen, data, log_row)
+                log_row += 1
+                # ic(data.get('user'))
+                # ic(data)
+                # Label(log_screen, text=data, font = self.widget_creator.larger_font,
+                #       wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
         except:
-            Label(log_screen, text='NO LOG DATA',font = self.widget_creator.larger_font).pack(side = TOP, anchor = NW)
-        Button(log_screen, text = ld.get_text_from_dict(self.language,'~54'), command = close,
-                fg="black", bg="gray", height=1, width=10
-               ).pack(side = BOTTOM)
+            Label(log_screen, text='NO LOG DATA', font=self.widget_creator.larger_font).grid(row=0, column=0)
+        Button(log_screen, text=ld.get_text_from_dict(self.language, '~54'), command=close,
+               fg="black", bg="gray", height=1, width=10
+               ).grid(sticky=S)
 
     def set_home(self):
         """This function sets up the home screen for the staffer"""
@@ -248,10 +257,7 @@ class manage_window:
         label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font,
                                fg=priority_color.get(priority))
         label_priority.grid(column=0, row=self.row_current)
-        if token in working_data.token_status_dict:
-            status = working_data.token_status_dict.get(token)
-        else:
-            status = '~55'
+        status = communicator.get_status(token)
         label_status = Label(self.window, text=ld.get_text_from_dict(self.language, status)
                              #####CHANGE TO GET ACTUAL STATUS
                              , font=self.widget_creator.medium_font)
@@ -261,13 +267,18 @@ class manage_window:
                            font=self.widget_creator.medium_font)  # will be actual time
         self.token_time_label[token] = label_time
         label_time.grid(column=2, row=self.row_current)
-        label_repost_time = Label(self.window, text='RPT', font=self.widget_creator.medium_font)
+
+        try:
+            rpt = datetime.fromtimestamp(int(working_data.log_dict.get(token)[-1].get('time'))).strftime('%H:%M')
+        except:
+            rpt = 'RPT'
+        label_repost_time = Label(self.window, text=rpt, font=self.widget_creator.medium_font)
         label_repost_time.grid(column=3, row=self.row_current)
         label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
                            font=self.widget_creator.medium_font)
         label_task.grid(column=4, row=self.row_current)
 
-    def write_task_screen(self, task_window_info, person_id, token, task_id):
+    def write_task_screen(self, task_window_info, person_id, token, task_id, priority):
         """This function makes calls to widgets module to display widgets in the UI
         :param task_window_info: list of task widgets that need to be added to the task screen
         :type task_window_info: list
@@ -298,17 +309,8 @@ class manage_window:
                 self.widget_creator.add_check_boxes(item[1:])
             elif item[0] == 'Button':
                 self.add_button_submit(item[1])
-        self.log_int.create_buttons(self.widget_creator.task_row, token)
-        #####THIS WILL GO SOMEWHERE ELSE EVENTUALLY##### PRIORITY
-        var = IntVar()
-        pri_lbl = Label(self.window,text=ld.get_text_from_dict(self.language, '~49') + ':', font = self.widget_creator.medium_font)
-        pri_radio_1 = Radiobutton(self.window, text='1', fg="red", variable=var, value=1)
-        pri_radio_2 = Radiobutton(self.window, text='2', fg="blue", variable=var, value=2)
-        pri_radio_3 = Radiobutton(self.window, text='3', fg="black", variable=var, value=3)
-        pri_lbl.grid(row=self.widget_creator.task_row+1, column=0, sticky='W')
-        pri_radio_1.grid(row=self.widget_creator.task_row+1, column=1, sticky='W')
-        pri_radio_2.grid(row=self.widget_creator.task_row+1, column=2, sticky='W')
-        pri_radio_3.grid(row=self.widget_creator.task_row+1, column=3, sticky='W')
+        self.widget_creator.priority_radio_buttons(priority)
+        self.log_int.create_buttons(self.widget_creator.task_row, token, self.widget_creator.get_priority())
 
     def clear_window(self):
         """This function clears the window that it is given allowing it to be a blank canvas before the window
@@ -359,7 +361,7 @@ class manage_window:
 
         else:
             self.at_home = True
-            self.home.return_data(self.working_token, data_return)
+            communicator.return_data(self.working_token, data_return)
             self.token_list.remove(self.working_token)
             self.token_start_time.pop(self.working_token)
             self.token_time_label.pop(self.working_token)
@@ -368,7 +370,6 @@ class manage_window:
             self.widget_creator.clear_widget_data()
             self.task_row = 10
             self.set_home()
-            # print(working_data.pe_outs)
             self.refresh_home()
 
     def add_to_log(self):

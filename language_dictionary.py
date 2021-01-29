@@ -67,6 +67,9 @@ english = {
     '~54': 'Close',
     '~55': 'Assigned',
     '~56': 'Staffers',
+    '~57': 'User',
+    '~58': 'Action',
+    '~59': 'Comments',
     '~100': 'Language Preference',
     '~101': 'English',
     '~102': 'Spanish'
@@ -129,6 +132,9 @@ spanish = {
     '~54': 'Cerrar',
     '~55': 'Asignado',
     '~56': 'Empleados',
+    '~57': 'Usuario',
+    '~58': 'Accion',
+    '~59': 'Comentarios',
     '~100': 'Preferencia de idioma',
     '~101': 'ingles',
     '~102': 'espanol'

@@ -36,13 +36,26 @@ On units:
 import query
 
 
+# BEGIN THE MURPHY FUNCTIONS - that call the specified murphy ######################################
+
 def murphy_mkv(person, murphy_num, maps_keys_values):
+    """here the murphy is being told by the caller the murphy_num AND what values to evaluate
+    this would typically be for a single key and for math operations: averages, trends, etc.
+
+    :param person: person whose values to operate on
+    :type person: str
+    :param murphy_num: the murphy to do
+    :type murphy_num: str
+    :param maps_keys_values: which key(s) and time specification of which values (by last, earliest, latest) to use
+    :type maps_keys_values: list
+    :return: the output of the murphy
+    """
     values = []
     for mkv in maps_keys_values:
         key = mkv[1]
         valuespec = mkv[2]
-        if not valuespec:
-            v = query.adat_person_key(person, key)
+        if not valuespec:                            # if there is not time specification of values to receive
+            v = query.adat_person_key(person, key)   # default is to get the most recent
             values.append(v[1])
         if valuespec:
             last = valuespec[0]
@@ -56,6 +69,15 @@ def murphy_mkv(person, murphy_num, maps_keys_values):
 
 
 def murphy(person, murphy_num):
+    """here the murphy is being told by the caller only the murphy_num
+    this would typically be for things (like BMI) where the values to call are built into the murphy
+
+    :param person: person whose values to operate on
+    :type person: str
+    :param murphy_num: the murphy to do
+    :type murphy_num: str
+    :return: the output of the murphy
+    """
     # result = eval(murphy_num + '(' + str(person) + ')')                        # despite this line of looking just the one five lines above
     # result = eval("m005('pers105')")                                           # (though there values where numbers and here person is a string)
     # result = eval('m005(' + "'pers105'" + ')')                                 # spent hours, leaving it like this because there has to be cleaner way
@@ -64,20 +86,43 @@ def murphy(person, murphy_num):
         murphy_num + '(' + '"' + "'" + str(person) + "'" + '"' + ')')  # is with: '"' + "'" + str(person) + "'" + '"'
     return result  # but then it needs trimming after reception in the murphy
 
+# ### END THE MURPHY FUNCTIONS - that call the specified murphy ######################################
 
-def murmkv001(values):  # divide a by ten
+
+# BEGIN THE ACTUAL MURPHYS  #############################################################
+# Their name is their murphy_num
+
+def murmkv001(values):
+    """divide a by ten - was learning example
+
+    :param values: a number
+    :type values: num (int or float)
+    :return: the inputted number divided by ten
+    """
     a = values[0]
     result = a / 10
     return result
 
 
-def murmkv002(values):  # divide a by b
+def murmkv002(values):
+    """ receives two numbers in a list, divides the first by the second and returns the result - a learning example
+
+    :param values: two numbers
+    :type values: list
+    :return: number that is the first divided by the second
+    """
     a, b = values[0], values[1]
     result = a / b
     return result
 
 
-def murmkv003(values):  # calculate average of a
+def murmkv003(values):
+    """ # calculate average of a list of values
+
+    :param values: list with a series of numbers in it
+    :type values: list
+    :return: the average of the numbers submitted
+    """
     a = values
     if a:
         result = sum(a) / len(a)
@@ -86,27 +131,43 @@ def murmkv003(values):  # calculate average of a
         return []
 
 
-def murmkv004(values):  # receive weight and height and calculate BMI
+def murmkv004(values):
+    """  receives a weight and height and calculates a returns the BMI
+
+    :param values: height and weight
+    :type values: list with two numbers
+    :return: BMI
+    """
     a, b = values[0], values[1]
     result = round(a / b ** 2, 1)
     return result
 
 
-def murphy005(person):  # receive person and calculate BMI
-    person = person[1:-1]  # the convoluted mess coming in needs this
-    a, b = query.adat_person_key(person, '~19')[1], query.adat_person_key(person, '~45')[1]
+def murphy005(person):
+    """   receives a person and calculates and returns the BMI
+
+    :param person: person
+    :type person: str
+    :return: BMI
+    """
+    person = person[1:-1]   # the convoluted mess coming in needs this, should be sleuthed and fixed
+    a, b = query.adat_person_key(person, '~19')[1], query.adat_person_key(person, '~45')[1]  # get last height & wt
     a, b = float(a), float(b)
     result = round(a / b ** 2, 1)
-    datas = eval("{'data': [{'k': '~47', 'v': " + str(result) + ", 'vt': 'f', 'units': None}]}")   # eval of the concatenated text string was essential
+    # the eval in the next line of the concatenated text string was essential to returning the proper format
+    datas = eval("{'data': [{'k': '~47', 'v': " + str(result) + ", 'vt': 'f', 'units': None}]}")
     return datas
 
 
-"""Other possible murphy ideas
+# ### END THE ACTUAL MURPHYS #############################################################
+
+
+"""
+Other possible murphy ideas
 trend - this could innumerably complex, depending on how many values, recency, 
   range of measurement error, short term or long term, etc.
   so, trend will be a pretty interesting function
 
 outlier - to score as high or low might also be a function that could be invoked. 
   It would mean hitting a reference table that would have to be local
-
 """
