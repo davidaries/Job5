@@ -103,6 +103,8 @@ class manage_window:
         self.widget_creator = wd(root, self.language, self.window)
         self.log_int = log_interactor.log_interactor(self.language, self.window, self.home, self.device_id)
 
+    def return_tokens(self):
+        return self.token_list
     def get_device_id(self):
         """Returns the device id of a staffers screen"""
         return self.device_id
@@ -121,10 +123,10 @@ class manage_window:
                 if task not in self.token_list and task not in self.tokens_completed:
                     self.token_start_time[task] = tasks.get(task)[6]
                     if self.at_home:
-                        # ic(tasks.get(task))
                         self.send_data(task, tasks.get(task))
                 if task not in self.token_list and task not in self.tokens_completed:
                     self.token_list.append(task)
+
                 if task in self.token_time_label and self.at_home and task not in self.tokens_completed:
                     self.update_wait_time(task)
         self.root.after(1000, self.poll_controller)
@@ -143,6 +145,8 @@ class manage_window:
         self.token_list.remove(token)
         self.token_start_time.pop(token)
         self.token_time_label.pop(token)
+        self.token_repost_time.pop(token)
+        self.token_repost_time_label.pop(token)
         # self.tokens_completed.remove(token)
 
     def refresh_home(self):
@@ -162,6 +166,7 @@ class manage_window:
         :type token: int
         :param raw_data: the data needed for creating the task screen of the user processed by the function
         :type raw_data: list"""
+        # ic(tasks)
         if self.at_home:
             task_id = raw_data[3]
             person_id = raw_data[0]
@@ -435,3 +440,6 @@ class manage_window:
 
     def clear_widgets(self):
         self.widget_creator.clear_widget_data()
+
+    def partial_complete(self, token):
+        self.tokens_completed.append(token)

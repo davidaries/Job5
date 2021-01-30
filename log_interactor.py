@@ -59,17 +59,13 @@ class log_interactor:  # rename to task_reassign
     def forward_btn_listener(self, token):
         self.staff_change = True
         self.log_textbox('~50', token)
-        current_staffer = ild.device_staff.get(self.device_id)
-        staff_type = ild.staffers.get(current_staffer).get('~23')
-        choices = grs.get_other_staffers(staff_type, current_staffer, True)
+        choices = communicator.get_possible_staff(self.device_id, True)
         self.drop_down(choices)
 
     def reassign_btn_listener(self, token):
         self.staff_change = True
         self.log_textbox('~51', token)
-        current_staffer = ild.device_staff.get(self.device_id)
-        staff_type = ild.staffers.get(current_staffer).get('~23')
-        self.alternate_staff = grs.get_other_staffers(staff_type, current_staffer, False)
+        self.alternate_staff = communicator.get_possible_staff(self.device_id,False)
 
     def return_btn_listener(self, token):
         self.staff_change = False
@@ -101,20 +97,27 @@ class log_interactor:  # rename to task_reassign
         communicator.update_log(token, device_id, status, comments, self.priority.get())
         if self.staff_change:
             communicator.change_staffer(token, self.device_id, self.alternate_staff)
-        else:
-            if status == '~8':#for paused tasks
+        else: #should be removing from UI screen
+            if status == '~8':#for returned tasks
                 communicator.return_data(token, None)
+                self.home.partial_complete(device_id,token)
             elif status =='~52':#for skipped tasks
                 communicator.return_data(token, None)
+                self.home.partial_complete(device_id,token)
             elif status == '~53':#for dropped tasks
                 communicator.return_data(token, None)
+                self.home.partial_complete(device_id,token)
 
         self.home.reset_window(self.device_id, token)
 
     def drop_down(self, choices):
         Label(self.window, text=ld.get_text_from_dict(self.language, '~56') + ': ').pack(side=LEFT, anchor=N)
         option = StringVar(self.window)
-        drop_down = OptionMenu(self.window, option, *choices)
+        choices_formatted = []
+        for choice in choices:
+            choices_formatted.append(communicator.name_from_staff_id(choice))
+        communicator.staff_id_from_name(choices_formatted[0])
+        drop_down = OptionMenu(self.window, option, *choices_formatted)
         self.alternate_staff = option
         drop_down.pack(side=LEFT, anchor=N)
 
