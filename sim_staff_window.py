@@ -96,6 +96,8 @@ class manage_window:
         self.token_list = []
         self.token_start_time = {}
         self.token_time_label = {}
+        self.token_repost_time = {}
+        self.token_repost_time_label = {}
         self.tokens_completed = []
         self.at_home = True
         self.widget_creator = wd(root, self.language, self.window)
@@ -133,6 +135,9 @@ class manage_window:
         :type token: int"""
         display_t_diff = sim_time.get_time_difference(self.token_start_time.get(token))
         self.token_time_label.get(token).config(text=display_t_diff)
+        if self.token_repost_time[token]:
+            display_rpt_diff = sim_time.get_time_difference(self.token_repost_time.get(token))
+            self.token_repost_time_label.get(token).config(text=display_rpt_diff)
 
     def clear_token(self, token):
         self.token_list.remove(token)
@@ -269,11 +274,12 @@ class manage_window:
         label_time.grid(column=2, row=self.row_current)
 
         try:
-            rpt = datetime.fromtimestamp(int(working_data.log_dict.get(token)[-1].get('time'))).strftime('%H:%M')
+            self.token_repost_time[token]=int(working_data.log_dict.get(token)[-1].get('time'))
         except:
-            rpt = 'RPT'
-        label_repost_time = Label(self.window, text=rpt, font=self.widget_creator.medium_font)
+            self.token_repost_time[token]=None
+        label_repost_time = Label(self.window, text=self.token_repost_time[token], font=self.widget_creator.medium_font)
         label_repost_time.grid(column=3, row=self.row_current)
+        self.token_repost_time_label[token] = label_repost_time
         label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
                            font=self.widget_creator.medium_font)
         label_task.grid(column=4, row=self.row_current)
@@ -302,7 +308,7 @@ class manage_window:
             elif item[0] == 'ModifyEntry':
                 self.widget_creator.add_entry_with_text(item[1], person_id)
             elif item[0] == 'EmptyEntry':
-                self.widget_creator.add_entry(item[1])
+                self.widget_creator.add_entry(item[1:])
             elif item[0] == 'DropDown':
                 self.widget_creator.add_drop_down(item[1:])
             elif item[0] == 'CheckBoxes':
@@ -329,10 +335,6 @@ class manage_window:
                             command=lambda: self.submit_btn_listener(),
                             fg="black", bg="gray", height=1, width=10)
         btn_submit.grid(row=self.widget_creator.task_row, column=0, sticky='S')
-        btn_return = Button(self.window, text=ld.get_text_from_dict(self.language, '~8'),  # ~8 for return/regresa
-                            command=self.return_home,
-                            fg="black", bg="gray", height=1, width=10)
-        btn_return.grid(row=self.widget_creator.task_row, column=1, sticky='S')
         self.task_row += 1
 
     def return_home(self):
@@ -383,7 +385,7 @@ class manage_window:
         else:
             return 'NO DATA GIVEN'
 
-    def add_value(self, key, value):
+    def add_value(self, key, value, units=None):
         """This function adds a key value pair to the stored information retrieved from the widgets in the task screen
         :param key: the key corresponding to a dictionary reference in language_dictionary
         :type key: str
@@ -391,14 +393,15 @@ class manage_window:
         :type value: int or str"""
         try:
             if float(value):
-                self.value_holder.append({'k': key, 'v': value, 'vt': 'f', 'units': '~41'})
+                self.value_holder.append({'k': key, 'v': float(value), 'vt': 'f', 'units': units})
+                #check for expected value
             elif bool(value):
-                self.value_holder.append({'k': key, 'v': value, 'vt': 'b', 'units': None})
+                self.value_holder.append({'k': key, 'v': value, 'vt': 'b', 'units': units})
         except:
             if value[0] == '~':
-                self.value_holder.append({'k': key, 'v': value, 'vt': '~', 'units': None})
+                self.value_holder.append({'k': key, 'v': value, 'vt': '~', 'units': units})
             else:
-                self.value_holder.append({'k': key, 'v': value, 'vt': 's', 'units': None})
+                self.value_holder.append({'k': key, 'v': value, 'vt': 's', 'units': units})
 
     def manage_widgets(self):
         """This function loops through the widgets stored in the task screen for the staffer.  It's job is to retrieve
@@ -407,15 +410,25 @@ class manage_window:
         widgets = self.widget_creator.return_widget_data()
         for widget in widgets:
             self.widgets.append(widget)
-            if len(widget) == 3:
+            if widget[0] == '~19':
+                try:
+                    range = widget[2].get('range')
+                    if range[0] <= float(widget[1].get()) <= range[1]:
+                        if widget[2].get('vt') == 'f' and float(widget[1].get()):
+                            self.add_value(widget[0], widget[1].get(), widget[2].get('units'))
+                except:
+                    self.clear_window()
+                    Label(self.window, text="INCORRECT WEIGHT", font='Helvetica 24 bold').pack()
+                    self.root.after(1000, self.return_home)
+            elif len(widget) == 3:
                 if len(widget[1].get()) > 0:
                     self.add_value(widget[0], widget[2].get(widget[1].get()))
-
             elif widget[0][0] == '~18':  # if it is a checkbox input
                 if widget[1][0].get() == 1:
                     self.add_value(widget[0][0], widget[1][1])
                 else:
                     self.widgets.pop()
+
             else:
                 if len(widget[1].get()) > 0:
                     self.add_value(widget[0], widget[1].get())

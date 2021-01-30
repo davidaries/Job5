@@ -19,7 +19,7 @@ class log_interactor:  # rename to task_reassign
 
     def create_buttons(self, row, token, priority):
         self.priority = priority
-        for _ in range(3):  # space buttons need to figure out a better way to do this
+        for _ in range(2):  # space buttons need to figure out a better way to do this
             row += 1
             Label(self.window, text=' ').grid(row=row, column=0)
         btn_pause = Button(self.window, text=ld.get_text_from_dict(self.language, '~6'),
@@ -103,11 +103,11 @@ class log_interactor:  # rename to task_reassign
             communicator.change_staffer(token, self.device_id, self.alternate_staff)
         else:
             if status == '~8':#for paused tasks
-                communicator.return_data(token, 'person returned')
+                communicator.return_data(token, None)
             elif status =='~52':#for skipped tasks
-                communicator.return_data(token, 'person skipped')
+                communicator.return_data(token, None)
             elif status == '~53':#for dropped tasks
-                communicator.return_data(token, 'person dropped')
+                communicator.return_data(token, None)
 
         self.home.reset_window(self.device_id, token)
 
