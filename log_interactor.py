@@ -101,6 +101,13 @@ class log_interactor:  # rename to task_reassign
         communicator.update_log(token, device_id, status, comments, self.priority.get())
         if self.staff_change:
             communicator.change_staffer(token, self.device_id, self.alternate_staff)
+        else:
+            if status == '~8':#for paused tasks
+                communicator.return_data(token, 'person returned')
+            elif status =='~52':#for skipped tasks
+                communicator.return_data(token, 'person skipped')
+            elif status == '~53':#for dropped tasks
+                communicator.return_data(token, 'person dropped')
 
         self.home.reset_window(self.device_id, token)
 

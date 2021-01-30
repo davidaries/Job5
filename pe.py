@@ -126,6 +126,7 @@ def protocol_engine(pe_ins_sol, pe_waits, pe_ins_unsol, pe_outs, pdata):
     calls_list = []
 
     if pe_ins_sol:  # solicited inputs
+        ic(pe_ins_sol)
         while pe_ins_sol:
             pe_in_sol = pe_ins_sol.pop(0)
             token_in = pe_in_sol[0]
