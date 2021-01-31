@@ -62,12 +62,9 @@ class widgets:
                 choice_dict[ld.get_text_from_dict(self.language, choice[0])] = choice[0]
             else:
                 has_long = True
-        # if list_call == 'c102':
-        """CHECK TO SEE IF THERE IS STUFF IN THE LONGER LIST INSTEAD OF HARD CODE"""
         if has_long:
             choices_formatted.append('_____________')
             for choice in choices:  # long list
-                # if list_call == 'c102':
                 choices_formatted.append(ld.get_text_from_dict(self.language, choice[0]))
                 choice_dict[ld.get_text_from_dict(self.language, choice[0])] = choice[0]
         option = StringVar(self.window)
@@ -99,18 +96,21 @@ class widgets:
             self.task_row += 1
         self.task_row += 1
 
-    def add_entry(self, value):
+    def add_entry(self, info):
         """This function adds an entry to the given window.  As it stands it only places the header for the entry box
          but entry box functionality will be added in the next update
         :param value: a dictionary reference to a value that needs to be written in the form a label to the screen
         :type value: str
         """
+        value = info[0]
+        units = info[1].get('units')
         lbl = Label(self.window, text=ld.get_text_from_dict(self.language, value) + ': ', font=self.medium_font)
         lbl.grid(row=self.task_row, column=0, ipady=self.row_padding, sticky='W')
         text_entered = Variable
         entry_box = Entry(self.window, textvariable=text_entered)
-        self.widgets.append((value, entry_box))
+        self.widgets.append((value, entry_box, info[1]))
         entry_box.grid(row=self.task_row, column=1, sticky='W')
+        Label(self.window, text=ld.get_text_from_dict(self.language, units), font = self.medium_font).grid(row=self.task_row, column=2, sticky='W')
         self.task_row += 1
 
     def add_entry_with_text(self, value, person_id):
@@ -189,14 +189,15 @@ class widgets:
         Label(window, text=data.get('comments'), font=self.medium_font, justify = LEFT, height=3, wraplength=190).grid(row=r, column=4)
 
     def priority_radio_buttons(self, priority):
-        pri_lbl = Label(self.window, text=ld.get_text_from_dict(self.language, '~49') + ':', font=self.medium_font)
+        self.task_row+=1
+        pri_lbl = Label(self.window, text=ld.get_text_from_dict(self.language, '~49'), font=self.medium_font)
         pri_radio_1 = tk.Radiobutton(self.window, text='1', fg="red", variable=self.priority, value=1)
         pri_radio_2 = tk.Radiobutton(self.window, text='2', fg="blue", variable=self.priority, value=2)
         pri_radio_3 = tk.Radiobutton(self.window, text='3', fg="black", variable=self.priority, value=3)
-        pri_lbl.grid(row=self.task_row + 1, column=0, sticky='W')
-        pri_radio_1.grid(row=self.task_row + 1, column=1, sticky='W')
-        pri_radio_2.grid(row=self.task_row + 1, column=2, sticky='W')
-        pri_radio_3.grid(row=self.task_row + 1, column=3, sticky='W')
+        pri_lbl.grid(row=self.task_row , column=0,sticky='W')
+        pri_radio_1.grid(row=self.task_row , column=1, sticky='W')
+        pri_radio_2.grid(row=self.task_row , column=2, sticky='W')
+        pri_radio_3.grid(row=self.task_row , column=3, sticky='W')
         if priority == 1:
             pri_radio_1.invoke()
         elif priority == 2:
