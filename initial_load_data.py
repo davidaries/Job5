@@ -90,7 +90,7 @@ staffer_login_info = {'s001': ['pass', False], 's002': ['pass', False],
                       }
 
 # PERSON RELATED DATA ###############################################################
-entrants = [['07:02', 'pers101'],  ['07:30', 'pers102'],  ['07:45', 'pers103'],   # what time they enter the clinic
+entrants = [['07:02', 'pers101'],  ['07:40', 'pers102'],  ['07:45', 'pers103'],   # what time they enter the clinic
             ['08:00', 'pers104'],  ['08:15', 'pers105'],  ['08:30', 'pers106']]
 
 

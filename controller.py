@@ -25,8 +25,7 @@ def check_entrant():
 def simulate():
     if not simulation_time.pause():
         # Now let's run the protocol engine
-        pe.protocol_engine(wd.pe_ins_sol, wd.pe_waits, wd.pe_ins_unsol,
-                           wd.pe_outs, wd.pdata)
+        pe.protocol_engine(wd.pe_ins_sol, wd.pe_ins_unsol, wd.pe_outs, wd.pe_waits, wd.pdata)
         check_entrant()
     simulation_time.root.after(1000, simulate)
 
