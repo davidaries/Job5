@@ -128,14 +128,12 @@ class sim_staff_window_manager:
         """
         self.home = home
 
-    def reset_window(self, device_id, token):
-        # ic(self.staff_dict.get(device_id).return_tokens())
-
+    def reset_window(self, device_id, token, clear_token):
         self.staff_dict.get(device_id).clear_widgets()
-        self.staff_dict.get(device_id).clear_token(token)
-        # ic(self.staff_dict.get(device_id).return_tokens())
+        if clear_token:
+            self.staff_dict.get(device_id).dat.clear_token(token)
         self.staff_dict.get(device_id).refresh_home()
-        # ic(self.staff_dict.get(device_id).return_tokens())
 
-    def partial_complete(self, device_id, token):
+    def partial_complete(self, device_id, token, clear_token):
         self.staff_dict.get(device_id).partial_complete(token)
+        self.reset_window(device_id, token, clear_token)

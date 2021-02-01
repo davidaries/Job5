@@ -7,6 +7,7 @@ import working_data
 import simulation_time as sim_time
 import log_interactor
 from icecream import ic
+from ui_data import ui_data
 import communicator
 
 
@@ -93,26 +94,14 @@ class manage_window:
         self.task_row = 0
         self.value_holder = []
         self.widgets = []
-        self.token_list = []
-        self.token_start_time = {}
-        self.token_time_label = {}
-        self.token_repost_time = {}
-        self.token_repost_time_label = {}
-        self.tokens_completed = []
         self.at_home = True
+        self.dat = ui_data()
         self.widget_creator = wd(root, self.language, self.window)
         self.log_int = log_interactor.log_interactor(self.language, self.window, self.home, self.device_id)
 
-    def return_tokens(self):
-        return self.token_list
     def get_device_id(self):
         """Returns the device id of a staffers screen"""
         return self.device_id
-
-    # def return_input_listener(self):
-    #     """This function allows the user to hit enter to invoke the submit_btn_listener instead of having to click the
-    #     actual button """
-    #     self.submit_btn_listener()
 
     def poll_controller(self):
         """This function checks for new tasks (based on the device_id of the staffer) every second to see if the
@@ -120,34 +109,11 @@ class manage_window:
         tasks = communicator.get_tasks(self.device_id)
         if tasks:
             for task in tasks:
-                if task not in self.token_list and task not in self.tokens_completed:
-                    self.token_start_time[task] = tasks.get(task)[6]
-                    if self.at_home:
-                        self.send_data(task, tasks.get(task))
-                if task not in self.token_list and task not in self.tokens_completed:
-                    self.token_list.append(task)
+                if self.dat.should_display(task, tasks) and self.at_home:
+                    self.send_data(task, tasks.get(task))
+                self.dat.should_update_time(task, self.at_home)
 
-                if task in self.token_time_label and self.at_home and task not in self.tokens_completed:
-                    self.update_wait_time(task)
         self.root.after(1000, self.poll_controller)
-
-    def update_wait_time(self, token):
-        """This function updates the wait time for a person that has arrived in the staffers home screen
-        :param token: the randomly generated value associated with the task for that person
-        :type token: int"""
-        display_t_diff = sim_time.get_time_difference(self.token_start_time.get(token))
-        self.token_time_label.get(token).config(text=display_t_diff)
-        if self.token_repost_time[token]:
-            display_rpt_diff = sim_time.get_time_difference(self.token_repost_time.get(token))
-            self.token_repost_time_label.get(token).config(text=display_rpt_diff)
-
-    def clear_token(self, token):
-        self.token_list.remove(token)
-        self.token_start_time.pop(token)
-        self.token_time_label.pop(token)
-        self.token_repost_time.pop(token)
-        self.token_repost_time_label.pop(token)
-        # self.tokens_completed.remove(token)
 
     def refresh_home(self):
         """This function simply refreshes the staffers home screen after completing a task"""
@@ -156,8 +122,10 @@ class manage_window:
         self.clear_window()
         self.set_home()
         if tasks:
-            self.token_time_label.clear()
-            for token in self.token_list:
+            ######################################################
+            self.dat.token_time_label.clear()  # MAYBE REWORK THIS
+            for token in self.dat.token_list:  # AND THIS
+            #######################################################
                 self.send_data(token, tasks.get(token))
 
     def send_data(self, token, raw_data):
@@ -166,16 +134,17 @@ class manage_window:
         :type token: int
         :param raw_data: the data needed for creating the task screen of the user processed by the function
         :type raw_data: list"""
-        # ic(tasks)
+        # ic(token)
         if self.at_home:
             task_id = raw_data[3]
             person_id = raw_data[0]
             task_window_info = raw_data[5]
             priority = raw_data[2]
-            self.populate_task(task_id, person_id, task_window_info, token, priority)
+            status = raw_data[8]
+            self.populate_task(task_id, person_id, task_window_info, token, priority, status)
             self.row_current += 1
 
-    def populate_task(self, task_id, person_id, task_window_info, token, priority):
+    def populate_task(self, task_id, person_id, task_window_info, token, priority, status):
         """This function adds the buttons for the staffer's task to the task window.
         :param task_id: the value that corresponds to the task that the staffer needs to complete
         :type task_id: str
@@ -186,7 +155,7 @@ class manage_window:
         :param token: the unique token id for the information handled by the staff member
         :type token: int"""
         # task_name = ld.get_text_from_dict(self.language, task_id)
-        self.add_person_to_tasks(priority, token, task_id)
+        self.add_person_to_tasks(priority, token, task_id, status)
         btn_log: Button = Button(self.window, text=ld.get_text_from_dict(self.language, '~13'),
                                  command=lambda: self.view_log_data(token), fg="black", bg="gray")
         btn_log.grid(column=5, row=self.row_current)
@@ -213,10 +182,6 @@ class manage_window:
             for data in working_data.log_dict.get(token):
                 self.widget_creator.display_log_info(log_screen, data, log_row)
                 log_row += 1
-                # ic(data.get('user'))
-                # ic(data)
-                # Label(log_screen, text=data, font = self.widget_creator.larger_font,
-                #       wraplength= self.window.geometry()[0:3]).pack(side = TOP, anchor = NW)
         except:
             Label(log_screen, text='NO LOG DATA', font=self.widget_creator.larger_font).grid(row=0, column=0)
         Button(log_screen, text=ld.get_text_from_dict(self.language, '~54'), command=close,
@@ -254,7 +219,7 @@ class manage_window:
         label_process.grid(column=6, row=self.row_current, sticky='W')
         self.row_current += 1
 
-    def add_person_to_tasks(self, priority, token, task_id):
+    def add_person_to_tasks(self, priority, token, task_id, status):
         """This function adds the name of a person who needs to be processed by the staffer
         :param person_id: identification number of the person
         :type person_id: int
@@ -267,24 +232,22 @@ class manage_window:
         label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font,
                                fg=priority_color.get(priority))
         label_priority.grid(column=0, row=self.row_current)
-        status = communicator.get_status(token)
+        # status = communicator.get_status(token)
         label_status = Label(self.window, text=ld.get_text_from_dict(self.language, status)
-                             #####CHANGE TO GET ACTUAL STATUS
                              , font=self.widget_creator.medium_font)
         label_status.grid(column=1, row=self.row_current)
-        time_difference = sim_time.get_time_difference(self.token_start_time.get(token))
-        label_time = Label(self.window, text=time_difference,
+        # time_difference = sim_time.get_time_difference(self.token_start_time.get(token))
+        label_time = Label(self.window, text=self.dat.time_diff_start_time(token),
                            font=self.widget_creator.medium_font)  # will be actual time
-        self.token_time_label[token] = label_time
+        self.dat.add_start_time_label(token, label_time)
         label_time.grid(column=2, row=self.row_current)
 
-        try:
-            self.token_repost_time[token]=int(working_data.log_dict.get(token)[-1].get('time'))
-        except:
-            self.token_repost_time[token]=None
-        label_repost_time = Label(self.window, text=self.token_repost_time[token], font=self.widget_creator.medium_font)
+        self.dat.update_repost_time(token)
+        label_repost_time = Label(self.window, text=self.dat.time_diff_repost_time(token),
+                                  font=self.widget_creator.medium_font)
         label_repost_time.grid(column=3, row=self.row_current)
-        self.token_repost_time_label[token] = label_repost_time
+        self.dat.add_repost_time_label(token, label_repost_time)
+
         label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
                            font=self.widget_creator.medium_font)
         label_task.grid(column=4, row=self.row_current)
@@ -369,10 +332,8 @@ class manage_window:
         else:
             self.at_home = True
             communicator.return_data(self.working_token, data_return)
-            self.token_list.remove(self.working_token)
-            self.token_start_time.pop(self.working_token)
-            self.token_time_label.pop(self.working_token)
-            self.tokens_completed.append(self.working_token)
+            self.dat.clear_token(self.working_token)
+            self.dat.tokens_completed.append(self.working_token)
             self.working_token = None
             self.widget_creator.clear_widget_data()
             self.task_row = 10
@@ -399,7 +360,7 @@ class manage_window:
         try:
             if float(value):
                 self.value_holder.append({'k': key, 'v': float(value), 'vt': 'f', 'units': units})
-                #check for expected value
+                # check for expected value
             elif bool(value):
                 self.value_holder.append({'k': key, 'v': value, 'vt': 'b', 'units': units})
         except:
@@ -442,4 +403,4 @@ class manage_window:
         self.widget_creator.clear_widget_data()
 
     def partial_complete(self, token):
-        self.tokens_completed.append(token)
+        self.dat.tokens_completed.append(token) #MAYBE RETHINK THIS ONE TOO

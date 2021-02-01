@@ -18,6 +18,8 @@ def update_log(token, device_id, status, comments, priority):
 
 
 def change_staffer(token, current_staffer, alternate_staffer):
+    ic(alternate_staffer)
+    ic(current_staffer)
     new_staff_device = None
     try:
         if alternate_staffer[0] =='s':
@@ -57,16 +59,11 @@ def get_status(token):
         return '~55'  # default to assingn dictionary value
 
 def add_flow_info(token, flow):
-    # if token in wd.flow_data:
-    #     wd.flow_data.get(token).append(flow)
-    # else:
-    #     wd.flow_data[token] = [flow]
-    # #simplified
     wd.flow_data[token] = flow
 
 def get_possible_staff(id_current_staff, is_list):
     current_staffer = ild.device_staff.get(id_current_staff)
-    staff_type = ild.staffers.get(current_staffer).get('~23')
+    staff_type = ild.staffers.get(str(current_staffer)).get('~23')
     return grs.get_other_staffers(staff_type, current_staffer, is_list)
 
 def staff_id_from_name(name):
@@ -75,3 +72,8 @@ def staff_id_from_name(name):
             return staff
 def name_from_staff_id(staff_id):
     return ild.staffers.get(staff_id).get('~1')
+
+def pause_tasks(staff_id, token, status):
+    ic(staff_id)
+    wd.pe_outs.get(str(staff_id)).get(token)[8]=status
+    ic(wd.pe_outs)

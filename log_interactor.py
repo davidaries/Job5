@@ -96,19 +96,23 @@ class log_interactor:  # rename to task_reassign
             comments = log_input
         communicator.update_log(token, device_id, status, comments, self.priority.get())
         if self.staff_change:
-            communicator.change_staffer(token, self.device_id, self.alternate_staff)
+            communicator.change_staffer(token, device_id, self.alternate_staff)
+            self.home.reset_window(device_id, token, True)
         else: #should be removing from UI screen
-            if status == '~8':#for returned tasks
+            if status == '~6':
+                communicator.pause_tasks(device_id, token, '~6')
+                self.home.reset_window(device_id, token, False)
+            elif status == '~8':#for returned tasks
                 communicator.return_data(token, None)
-                self.home.partial_complete(device_id,token)
+                self.home.partial_complete(device_id, token, True)
             elif status =='~52':#for skipped tasks
                 communicator.return_data(token, None)
-                self.home.partial_complete(device_id,token)
+                self.home.partial_complete(device_id, token, True)
             elif status == '~53':#for dropped tasks
                 communicator.return_data(token, None)
-                self.home.partial_complete(device_id,token)
+                self.home.partial_complete(device_id, token, True)
 
-        self.home.reset_window(self.device_id, token)
+
 
     def drop_down(self, choices):
         Label(self.window, text=ld.get_text_from_dict(self.language, '~56') + ': ').pack(side=LEFT, anchor=N)

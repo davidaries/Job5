@@ -92,11 +92,14 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
             # And finally need to remove the lines processed from pe_outs and pe_waits
             del pe_outs[pe_waits[token_in][0]][token_in]
             del pe_waits[token_in]
+
             # Now we add to (replace) in pe_outs and pe_waits things staffers said they would come back to
             for replacing_pe_out in replacing_pe_outs:
                 pe_outs[replacing_pe_out[0]][replacing_pe_out[1]] = replacing_pe_out[2]  # adds to pe_outs
+                # ic(pe_outs)
             for replacing_pe_wait in replacing_pe_waits:
                 pe_waits[replacing_pe_wait[0]] = replacing_pe_wait[1]  # adds to pe_waits
+                # ic(pe_waits)
 
 
     if pe_ins_unsol:
