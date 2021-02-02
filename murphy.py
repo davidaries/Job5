@@ -1,5 +1,5 @@
 # murphy.py
-
+from icecream import ic
 """
 main idea is that something can call a murphy, to get a calculation or some logic
 and the murphy gets the data it needs using query.py
@@ -35,7 +35,9 @@ On units:
 
 import query
 
-
+# func_dict={'murphy005': lambda p: murphy005(p)}
+func_dict={'murphy005': lambda p: murphy005('\''+p+'\'')  #not sure we will need the formatting with this implementation
+           }
 # BEGIN THE MURPHY FUNCTIONS - that call the specified murphy ######################################
 
 def murphy_mkv(person, murphy_num, maps_keys_values):
@@ -82,8 +84,10 @@ def murphy(person, murphy_num):
     # result = eval("m005('pers105')")                                           # (though there values where numbers and here person is a string)
     # result = eval('m005(' + "'pers105'" + ')')                                 # spent hours, leaving it like this because there has to be cleaner way
     # result = eval(murphy_num + '(' + "'pers105'" + ')')                        # for now, only way I can figure to generate: "'pers105'"
-    result = eval(
-        murphy_num + '(' + '"' + "'" + str(person) + "'" + '"' + ')')  # is with: '"' + "'" + str(person) + "'" + '"'
+    # func = '%s(%s)' % (murphy_num,str(person))
+    result = func_dict[murphy_num](person)
+    # result = eval(
+    #     murphy_num + '(' + '"' + "'" + str(person) + "'" + '"' + ')')  # is with: '"' + "'" + str(person) + "'" + '"'
     return result  # but then it needs trimming after reception in the murphy
 
 # ### END THE MURPHY FUNCTIONS - that call the specified murphy ######################################
@@ -91,7 +95,7 @@ def murphy(person, murphy_num):
 
 # BEGIN THE ACTUAL MURPHYS  #############################################################
 # Their name is their murphy_num
-
+#'murmkv001': lambda v: murmkv001(v)
 def murmkv001(values):
     """divide a by ten - was learning example
 
@@ -103,7 +107,7 @@ def murmkv001(values):
     result = a / 10
     return result
 
-
+#'murmkv002': lambda v: murmkv002(v)
 def murmkv002(values):
     """ receives two numbers in a list, divides the first by the second and returns the result - a learning example
 
@@ -115,7 +119,7 @@ def murmkv002(values):
     result = a / b
     return result
 
-
+#'murmkv003': lambda v: murmkv003(v)
 def murmkv003(values):
     """ # calculate average of a list of values
 
@@ -130,7 +134,7 @@ def murmkv003(values):
     else:
         return []
 
-
+#'murmkv003': lambda v: murmkv003(v)
 def murmkv004(values):
     """  receives a weight and height and calculates a returns the BMI
 
@@ -150,6 +154,8 @@ def murphy005(person):
     :type person: str
     :return: BMI
     """
+    print('in murphy person')
+    ic(person)
     person = person[1:-1]   # the convoluted mess coming in needs this, should be sleuthed and fixed
     a, b = query.adat_person_key(person, '~19')[1], query.adat_person_key(person, '~45')[1]  # get last height & wt
     a, b = float(a), float(b)

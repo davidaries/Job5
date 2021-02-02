@@ -73,7 +73,7 @@ class sim_staff_window_manager:
             self.vertical_spacing += 350
             self.horizontal_spacing = 0
         screen = Toplevel(self.root)
-        screen.geometry("490x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
+        screen.geometry("470x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
         self.horizontal_spacing += 500
         return screen
 

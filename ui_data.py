@@ -25,32 +25,26 @@ class ui_data:
         :param token: the randomly generated value associated with the task for that person
         :type token: int"""
         display_t_diff = sim_time.get_time_difference(self.token_start_time.get(token))
-        self.token_time_label.get(token).config(text=display_t_diff)
         if self.token_repost_time[token]:
-            display_rpt_diff = sim_time.get_time_difference(self.token_repost_time.get(token))
-            self.token_repost_time_label.get(token).config(text=display_rpt_diff)
+            display_t_diff += '/'+sim_time.get_time_difference(self.token_repost_time.get(token))
+        self.token_time_label.get(token).config(text=display_t_diff)
+        # if self.token_repost_time[token]:
+        #     display_rpt_diff = "%s%s"%(sim_time.get_time_difference(self.token_repost_time.get(token)),
+        #                                )
+        #     self.token_repost_time_label.get(token).config(text=display_rpt_diff)
 
     def clear_token(self, token): # move to ui_data.py
         self.token_list.remove(token)
         self.token_start_time.pop(token)
         self.token_time_label.pop(token)
         self.token_repost_time.pop(token)
-        self.token_repost_time_label.pop(token)
 
     def time_diff_start_time(self, token):
         return sim_time.get_time_difference(self.token_start_time.get(token))
     def add_start_time_label(self, token, label_time):
         self.token_time_label[token] = label_time
-    def time_diff_repost_time(self, token):
-        if self.token_repost_time[token]:
-            return sim_time.get_time_difference(self.token_repost_time.get(token))
-        else:
-            return '--:--'
     def update_repost_time(self, token):
         try:
             self.token_repost_time[token] = int(wd.log_dict.get(token)[-1].get('time'))
         except:
             self.token_repost_time[token] = None
-
-    def add_repost_time_label(self, token, label_repost_time):
-        self.token_repost_time_label[token] = label_repost_time

@@ -24,28 +24,29 @@ class log_interactor:  # rename to task_reassign
             Label(self.window, text=' ').grid(row=row, column=0)
         btn_pause = Button(self.window, text=ld.get_text_from_dict(self.language, '~6'),
                            command=lambda: self.pause_btn_listener(token),
-                           fg="black", bg="gray", height=1, width=10)
+                           fg="green", bg="light gray", height=1, width=10)
         btn_pause.grid(row=row, column=0, sticky='S')
         btn_forward = Button(self.window, text=ld.get_text_from_dict(self.language, '~50'),
                              command=lambda: self.forward_btn_listener(token),
-                             fg="black", bg="gray", height=1, width=10)
+                             fg="blue", bg="light gray", height=1, width=10)
         btn_forward.grid(row=row, column=1, sticky='S')
-        btn_reassign = Button(self.window, text=ld.get_text_from_dict(self.language, '~51'),
-                              command=lambda: self.reassign_btn_listener(token),
-                              fg="black", bg="gray", height=1, width=10)
-        btn_reassign.grid(row=row, column=2, sticky='S')
+        btn_skip = Button(self.window, text=ld.get_text_from_dict(self.language, '~52'),
+                          command=lambda: self.skip_btn_listener(token),
+                          fg="red", bg="light gray", height=1, width=10)
+        btn_skip.grid(row=row, column=2, sticky='S')
+
         row += 1
         btn_return = Button(self.window, text=ld.get_text_from_dict(self.language, '~8'),
                             command=lambda: self.return_btn_listener(token),
-                            fg="black", bg="gray", height=1, width=10)
+                            fg="green", bg="light gray", height=1, width=10)
         btn_return.grid(row=row, column=0, sticky='S')
-        btn_skip = Button(self.window, text=ld.get_text_from_dict(self.language, '~52'),
-                          command=lambda: self.skip_btn_listener(token),
-                          fg="black", bg="gray", height=1, width=10)
-        btn_skip.grid(row=row, column=1, sticky='S')
+        btn_reassign = Button(self.window, text=ld.get_text_from_dict(self.language, '~51'),
+                              command=lambda: self.reassign_btn_listener(token),
+                              fg="blue", bg="light gray", height=1, width=10)
+        btn_reassign.grid(row=row, column=1, sticky='S')
         btn_drop = Button(self.window, text=ld.get_text_from_dict(self.language, '~53'),
                           command=lambda: self.drop_btn_listener(token),
-                          fg="black", bg="gray", height=1, width=10)
+                          fg="red", bg="light gray", height=1, width=10)
         btn_drop.grid(row=row, column=2, sticky='S')
 
         ### FUNCTIONALITY to enable/ diable buttons
@@ -96,7 +97,7 @@ class log_interactor:  # rename to task_reassign
             comments = log_input
         communicator.update_log(token, device_id, status, comments, self.priority.get())
         if self.staff_change:
-            communicator.change_staffer(token, device_id, self.alternate_staff)
+            communicator.change_staffer(token, device_id, self.alternate_staff, status)
             self.home.reset_window(device_id, token, True)
         else: #should be removing from UI screen
             if status == '~6':

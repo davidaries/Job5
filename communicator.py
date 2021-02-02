@@ -8,7 +8,7 @@ from icecream import ic
 def update_log(token, device_id, status, comments, priority):
     time = simulation_time.get_time_stamp()
     user = ild.device_staff.get(device_id)
-    wd.pe_outs.get(str(device_id))[token][2]=priority
+    wd.pe_outs.get(str(device_id))[token][2] = priority
     log_data = {'user': user, 'time': time, 'status': status, 'priority': priority, 'comments': comments}
     if token in wd.log_dict:
         wd.log_dict.get(token).append(log_data)
@@ -17,18 +17,20 @@ def update_log(token, device_id, status, comments, priority):
     wd.token_status_dict[token] = status
 
 
-def change_staffer(token, current_staffer, alternate_staffer):
+def change_staffer(token, current_staffer, alternate_staffer, status):
     ic(alternate_staffer)
     ic(current_staffer)
     new_staff_device = None
     try:
-        if alternate_staffer[0] =='s':
+        if alternate_staffer[0] == 's':
             new_staff_device = ild.staff_device.get(alternate_staffer)
     except:
         name = alternate_staffer.get()
         new_staff_device = ild.staff_device.get(staff_id_from_name(name))
-    wd.pe_waits.get(token)[0] = str(new_staff_device)#may change with dict implementation
+
+    wd.pe_waits.get(token)[0] = str(new_staff_device)  # may change with dict implementation
     pe_out = wd.pe_outs[str(current_staffer)].pop(token)
+    pe_out[8] = status #update status with forward or reassign
     wd.pe_outs.get(str(new_staff_device))[token] = pe_out
 
 
@@ -52,28 +54,25 @@ def get_tasks(device_id):
     return wd.pe_outs.get(str(device_id))
 
 
-def get_status(token):
-    if token in wd.token_status_dict:
-        return wd.token_status_dict.get(token)  # if there is a marked status return it
-    else:
-        return '~55'  # default to assingn dictionary value
-
 def add_flow_info(token, flow):
     wd.flow_data[token] = flow
+
 
 def get_possible_staff(id_current_staff, is_list):
     current_staffer = ild.device_staff.get(id_current_staff)
     staff_type = ild.staffers.get(str(current_staffer)).get('~23')
     return grs.get_other_staffers(staff_type, current_staffer, is_list)
 
+
 def staff_id_from_name(name):
     for staff in ild.staffers:
         if ild.staffers.get(staff).get('~1') == name:
             return staff
+
+
 def name_from_staff_id(staff_id):
     return ild.staffers.get(staff_id).get('~1')
 
+
 def pause_tasks(staff_id, token, status):
-    ic(staff_id)
-    wd.pe_outs.get(str(staff_id)).get(token)[8]=status
-    ic(wd.pe_outs)
+    wd.pe_outs.get(str(staff_id)).get(token)[8] = status

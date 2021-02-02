@@ -85,11 +85,11 @@ class manage_window:
         self.working_token = None
         # self.sim_time = sim_time
         self.staff_name = staffer.get('~1')
-        self.staff_id = staffer.get('~23')
+        self.staff_job = staffer.get('~23')
         self.language = staffer.get('~100')
         self.device_id = device_id
         self.column_padding = 80
-        self.row_padding = 12
+        self.width = 14
         self.row_current = 2
         self.task_row = 0
         self.value_holder = []
@@ -125,7 +125,7 @@ class manage_window:
             ######################################################
             self.dat.token_time_label.clear()  # MAYBE REWORK THIS
             for token in self.dat.token_list:  # AND THIS
-            #######################################################
+                #######################################################
                 self.send_data(token, tasks.get(token))
 
     def send_data(self, token, raw_data):
@@ -134,7 +134,7 @@ class manage_window:
         :type token: int
         :param raw_data: the data needed for creating the task screen of the user processed by the function
         :type raw_data: list"""
-        # ic(token)
+        ic(raw_data)
         if self.at_home:
             task_id = raw_data[3]
             person_id = raw_data[0]
@@ -155,20 +155,22 @@ class manage_window:
         :param token: the unique token id for the information handled by the staff member
         :type token: int"""
         # task_name = ld.get_text_from_dict(self.language, task_id)
-        self.add_person_to_tasks(priority, token, task_id, status)
-        btn_log: Button = Button(self.window, text=ld.get_text_from_dict(self.language, '~13'),
-                                 command=lambda: self.view_log_data(token), fg="black", bg="gray")
-        btn_log.grid(column=5, row=self.row_current)
-        btn_process: Button = Button(self.window, text=' -> ',
-                                     command=lambda: self.write_task_screen(task_window_info, person_id, token,
-                                                                            task_id, priority),
-                                     fg="black", bg="gray")
-        btn_process.grid(column=6, row=self.row_current)
-        self.row_current += 1
         name = query.adat_person_key(person_id, '~1')[1]  # maybe list handling should be done in query.py
         label_name = Label(self.window, text=name, font=self.widget_creator.medium_font)
-        label_name.grid(column=0, row=self.row_current, sticky='W')
+        label_name.grid(column=0, row=self.row_current, sticky=W)
+
+        btn_process: Button = Button(self.window, text='=>',
+                                     command=lambda: self.write_task_screen(task_window_info, person_id, token,
+                                                                            task_id, priority),
+                                     fg="black", bg="gray", width=self.width)
+        btn_process.grid(column=3, row=self.row_current, sticky=E)
+
         self.row_current += 1
+        btn_log: Button = Button(self.window, text=ld.get_text_from_dict(self.language, '~13'), width=self.width,
+                                 command=lambda: self.view_log_data(token), fg="black", bg="gray")
+        btn_log.grid(column=0, row=self.row_current)
+
+        self.add_person_to_tasks(priority, token, task_id, status)
 
     def view_log_data(self, token):
         def close():
@@ -190,33 +192,38 @@ class manage_window:
 
     def set_home(self):
         """This function sets up the home screen for the staffer"""
-        self.window.title(ld.get_text_from_dict(self.language, self.staff_id))
+        self.window.title(ld.get_text_from_dict(self.language, self.staff_job))
         staff_name = Label(self.window, text=self.staff_name, font=self.widget_creator.larger_font)
-        staff_name.grid(column=0, row=0)
+        staff_name.grid(column=0, row=0, columnspan=2, sticky=W)
+        staff_job = Label(self.window, text=ld.get_text_from_dict(self.language, self.staff_job),
+                          font=self.widget_creator.larger_font)
+        staff_job.grid(column=2, row=0, columnspan=2, sticky=E)
         self.add_column_headers()
 
     def add_column_headers(self):
         """This function adds the headers for the tasks in the home screen"""
+        label_priority = Label(self.window, text='', width=self.width, borderwidth=3)
+        label_priority.grid(column=0, row=self.row_current, sticky=W)
         label_priority = Label(self.window, text=ld.get_text_from_dict(self.language, '~49') + '  ',
-                               font=self.widget_creator.medium_font)
-        label_priority.grid(column=0, row=self.row_current)
+                               font=self.widget_creator.medium_font, width=self.width, borderwidth=3, relief=GROOVE)
+        label_priority.grid(column=1, row=self.row_current, sticky=W)
         label_status = Label(self.window, text=ld.get_text_from_dict(self.language, '~48') + '  ',
-                             font=self.widget_creator.medium_font)
-        label_status.grid(column=1, row=self.row_current, sticky='W')
+                             font=self.widget_creator.medium_font, width=self.width, borderwidth=3, relief=GROOVE)
+        label_status.grid(column=2, row=self.row_current, sticky=W)
         label_time = Label(self.window, text=ld.get_text_from_dict(self.language, '~10') + '  ',
-                           font=self.widget_creator.medium_font)
-        label_time.grid(column=2, row=self.row_current)
-        label_repost_time = Label(self.window, text='Repost Time  ', font=self.widget_creator.medium_font)
-        label_repost_time.grid(column=3, row=self.row_current)
-        label_task = Label(self.window, text=ld.get_text_from_dict(self.language, '~33') + '  ',
-                           font=self.widget_creator.medium_font)
-        label_task.grid(column=4, row=self.row_current, sticky='W')
-        label_log = Label(self.window, text=ld.get_text_from_dict(self.language, '~13') + '  ',
-                          font=self.widget_creator.medium_font)
-        label_log.grid(column=5, row=self.row_current)
-        label_process = Label(self.window, text='  ',
-                              font=self.widget_creator.medium_font)
-        label_process.grid(column=6, row=self.row_current, sticky='W')
+                           font=self.widget_creator.medium_font, width=self.width, borderwidth=3, relief=GROOVE)
+        label_time.grid(column=3, row=self.row_current, sticky=W)
+        # label_repost_time = Label(self.window, text='Repost Time  ', font=self.widget_creator.medium_font)
+        # label_repost_time.grid(column=3, row=self.row_current)
+        # label_task = Label(self.window, text=ld.get_text_from_dict(self.language, '~33') + '  ',
+        #                    font=self.widget_creator.medium_font)
+        # label_task.grid(column=4, row=self.row_current, sticky='W')
+        # label_log = Label(self.window, text=ld.get_text_from_dict(self.language, '~13') + '  ',
+        #                   font=self.widget_creator.medium_font)
+        # label_log.grid(column=5, row=self.row_current)
+        # label_process = Label(self.window, text='  ',
+        #                       font=self.widget_creator.medium_font)
+        # label_process.grid(column=6, row=self.row_current, sticky='W')
         self.row_current += 1
 
     def add_person_to_tasks(self, priority, token, task_id, status):
@@ -227,30 +234,31 @@ class manage_window:
         :type priority: int
         :param token: the token value of the task in question
         :type token: int"""
+
         priority_color = {1: "red", 2: "blue", 3: "black"}
 
         label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font,
                                fg=priority_color.get(priority))
-        label_priority.grid(column=0, row=self.row_current)
+        label_priority.grid(column=1, row=self.row_current)
         # status = communicator.get_status(token)
         label_status = Label(self.window, text=ld.get_text_from_dict(self.language, status)
                              , font=self.widget_creator.medium_font)
-        label_status.grid(column=1, row=self.row_current)
+        label_status.grid(column=2, row=self.row_current)
         # time_difference = sim_time.get_time_difference(self.token_start_time.get(token))
         label_time = Label(self.window, text=self.dat.time_diff_start_time(token),
                            font=self.widget_creator.medium_font)  # will be actual time
         self.dat.add_start_time_label(token, label_time)
-        label_time.grid(column=2, row=self.row_current)
+        label_time.grid(column=3, row=self.row_current)
 
         self.dat.update_repost_time(token)
-        label_repost_time = Label(self.window, text=self.dat.time_diff_repost_time(token),
-                                  font=self.widget_creator.medium_font)
-        label_repost_time.grid(column=3, row=self.row_current)
-        self.dat.add_repost_time_label(token, label_repost_time)
-
-        label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
-                           font=self.widget_creator.medium_font)
-        label_task.grid(column=4, row=self.row_current)
+        # label_repost_time = Label(self.window, text=self.dat.time_diff_repost_time(token),
+        #                           font=self.widget_creator.medium_font)
+        # label_repost_time.grid(column=3, row=self.row_current)
+        # self.dat.add_repost_time_label(token, label_repost_time)
+        #
+        # label_task = Label(self.window, text=ld.get_text_from_dict(self.language, task_id),
+        #                    font=self.widget_creator.medium_font)
+        # label_task.grid(column=4, row=self.row_current)
 
     def write_task_screen(self, task_window_info, person_id, token, task_id, priority):
         """This function makes calls to widgets module to display widgets in the UI
@@ -301,8 +309,8 @@ class manage_window:
         """
         btn_submit = Button(self.window, text=ld.get_text_from_dict(self.language, value),
                             command=lambda: self.submit_btn_listener(),
-                            fg="black", bg="gray", height=1, width=10)
-        btn_submit.grid(row=self.widget_creator.task_row, column=0, sticky='S')
+                            fg="black", bg="light gray", height=1, width=10)
+        btn_submit.grid(row=self.widget_creator.task_row, column=3, sticky=E)
         self.task_row += 1
 
     def return_home(self):
@@ -403,4 +411,4 @@ class manage_window:
         self.widget_creator.clear_widget_data()
 
     def partial_complete(self, token):
-        self.dat.tokens_completed.append(token) #MAYBE RETHINK THIS ONE TOO
+        self.dat.tokens_completed.append(token)  # MAYBE RETHINK THIS ONE TOO
