@@ -62,16 +62,25 @@ def murphy_mkv(person, murphy_num, maps_keys_values):
             v = query.adat_person_key(person, key)   # default is to get the most recent
             values.append(v[1])
         if valuespec:
-            last = valuespec[0]
-            earliest = valuespec[1]
-            latest = valuespec[2]
+            try:
+                last = valuespec[0]
+            except:
+                last = 1
+            try:
+                earliest = valuespec[1]
+            except:
+                earliest = None
+            try:
+                latest = valuespec[2]
+            except:
+                latest = None
             vs = query.adat_person_key_options(person, key, last, earliest, latest)
             for v in vs:
                 values.append(v[1])
-    #what it should look like
-    #result = func_dict[murphy_num](values)
-    result = eval(murphy_num + '(' + str(values) + ')')
-    return result
+    result = func_dict[murphy_num](values)
+    datas = {'data': [{'k': key, 'v': (str(result)), 'vt': 'f', 'units': None}]}
+    return datas
+
 
 
 def murphy(person, murphy_num):

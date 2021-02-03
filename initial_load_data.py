@@ -13,14 +13,23 @@ p0001 = {      # this is what protocol p0001 with its four steps will look like 
     1: ['st_1', '~34', 'UI', ('PersonHeader', 'TaskHeader',
         ('ModifyEntry', '~16'), ('Button', '~20')), None, ({'call': [['p0001', 2, 3]]})],
     2: ['st_1', '~35', 'UI', ('PersonHeader', 'TaskHeader',
-        ('EmptyEntry', '~19', {'vt': 'f', 'range': [0.1, 250], 'units': '~41'}), ('DropDown', '~17', 'c117'), ('Button', '~20')), None, ({'call': [['p0001', 3, 3]]})],
+        ('EmptyEntry', '~19', {'vt': 'f', 'range': [0.1, 250], 'units': '~41'}),
+        ('DropDown', '~17', 'c117'), ('Button', '~20')), None, ({'call': [['p0001', 3, 3], ['p0001', 7, 3]]})],
     3: ['st_1', 'calc BMI', 'murphy', 'murphy005', None, ({'call': [['p0001', 4, 3]]})],
     4: ['st_1', 'diabetes screen', 'decisioning', 'BMI_d1', None, ({'call': [['p0001', 5, 3]]})],
     5: ['st_1', '~36', 'UI', ('PersonHeader', 'TaskHeader',
         ('Fixed', '~17'), ('DropDown', '~2', 'c102'), ('Button', '~20')), None, ({'call': [['p0001', 6, 3]]})],
     6: ['st_1', '~18', 'UI', ('PersonHeader', 'TaskHeader',
-                              ('Fixed', '~2'), ('CheckBoxes', '~18', 'c118'), ('Button', '~20')), None, ({})]}
-# 7: ['st_1', 'calc avg weight', 'murphy_mkv', 'murmkv003, [3]', None, ({'call': [['p0001', 4, 3]]})]
+                              ('Fixed', '~2'), ('CheckBoxes', '~18', 'c118'), ('Button', '~20')), None, ({})],
+    7: ['st_1', 'calc avg weight', 'murphy_mkv', ['murmkv003', [['a', '~19', [3]]]], None, ({})]
+    # Note: three issues remain with step 7:
+    # 1. it is returning the average as yet another weight (~19), there is no key for average weight
+    # 2. it is not returning the units (~41) - murmkv003 doesn't ever ask, so can't return them
+    # and it's not clear today (2/3/21) what the use case is for average, and if we even want to write it pdata/adat
+    # but it's an easy to resolve as we continue to build out murphys
+    # 3. step 2 is a branch (to steps 3 & 7), but there is no subsequent merge
+    # which should be there if branch is within same protocol. But this example is artificial, so leave it for now.
+    }
 
 p0002 = {      # this is what protocol p0001 with its four steps will look like when loaded from the table
     1: ['st_1', '~18', 'UI', ('PersonHeader', 'TaskHeader',
@@ -92,10 +101,3 @@ staffer_login_info = {'s001': ['pass', False], 's002': ['pass', False],
 # PERSON RELATED DATA ###############################################################
 entrants = [['07:02', 'pers101'],  ['07:40', 'pers102'],  ['07:45', 'pers103'],   # what time they enter the clinic
             ['08:00', 'pers104'],  ['08:15', 'pers105'],  ['08:30', 'pers106']]
-
-
-# adat is a dictionary where the key is the person, and then each person is a dictionary
-# where the key is k, and value is a list with lists (inner lists) within.
-# each of the inner lists has the following seven fields.
-# adatm[0], entity[1], parent[2], vt[3], v[4], units[5], event_dts[6]
-

@@ -140,10 +140,14 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
             proto_ = call[0][0]
             step_ = call[0][1]
             call_type = ild.protocols[proto_][step_][2]
-            if call_type == 'murphy':
-                spec = ild.protocols[proto_][step_][3]
-                datas = murphy.murphy(person, spec)
-                calls = ild.protocols[proto_][step_][5].get('call')
+            if call_type in ['murphy', 'murphy_mkv']:
+                if call_type == 'murphy':
+                    spec = ild.protocols[proto_][step_][3]
+                    datas = murphy.murphy(person, spec)
+                else:
+                    murphy_num = ild.protocols[proto_][step_][3][0]
+                    spec = ild.protocols[proto_][step_][3][1]
+                    datas = murphy.murphy_mkv(person, murphy_num, spec)
                 # now we need to create the line to write to pdata
                 pdatm = random.randint(100001, 999999)
                 entity = call[1][2]
