@@ -19,8 +19,8 @@ p0001 = {      # this is what protocol p0001 with its four steps will look like 
     5: ['st_1', '~36', 'UI', ('PersonHeader', 'TaskHeader',
         ('Fixed', '~17'), ('DropDown', '~2', 'c102'), ('Button', '~20')), None, ({'call': [['p0001', 6, 3]]})],
     6: ['st_1', '~18', 'UI', ('PersonHeader', 'TaskHeader',
-                              ('Fixed', '~2'), ('CheckBoxes', '~18', 'c118'), ('Button', '~20')), None, ({})]
-    }
+                              ('Fixed', '~2'), ('CheckBoxes', '~18', 'c118'), ('Button', '~20')), None, ({})]}
+# 7: ['st_1', 'calc avg weight', 'murphy_mkv', 'murmkv003, [3]', None, ({'call': [['p0001', 4, 3]]})]
 
 p0002 = {      # this is what protocol p0001 with its four steps will look like when loaded from the table
     1: ['st_1', '~18', 'UI', ('PersonHeader', 'TaskHeader',

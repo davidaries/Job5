@@ -21,6 +21,7 @@ class widgets:
         self.row_padding = 12
         self.row_current = 2
         self.task_row = 0
+        self.width = 14
         self.widgets = []
         self.login_widgets = []
         self.priority = IntVar()
@@ -36,11 +37,11 @@ class widgets:
         :type value: str
         """
         lbl = Label(self.window, text=ld.get_text_from_dict(self.language, value) + ': ', font=self.medium_font)
-        lbl.grid(row=self.task_row, column=0, ipady=self.row_padding, sticky='W')
+        lbl.grid(row=self.task_row, column=0, ipady=self.row_padding, sticky='W', columnspan = 2)
         lbl_val = query.adat_person_key(person_id, value)[1]
-        lbl_info = Label(self.window, text=ld.get_text_from_dict(self.language, lbl_val))
+        lbl_info = Label(self.window, text=ld.get_text_from_dict(self.language, lbl_val), font = self.medium_font)
 
-        lbl_info.grid(row=self.task_row, column=1, ipady=self.row_padding, sticky='W')
+        lbl_info.grid(row=self.task_row, column=1, ipady=self.row_padding, sticky=S)
         self.task_row += 1
 
     def add_drop_down(self, value):
@@ -69,7 +70,7 @@ class widgets:
                 choice_dict[ld.get_text_from_dict(self.language, choice[0])] = choice[0]
         option = StringVar(self.window)
         drop_down = OptionMenu(self.window, option, *choices_formatted)
-        drop_down.grid(row=self.task_row, column=1, sticky='W')
+        drop_down.grid(row=self.task_row, column=1, sticky=W, columnspan = 2)
 
         self.widgets.append((drop_down_lbl, option, choice_dict))
         self.task_row += 1
@@ -92,7 +93,7 @@ class widgets:
             box = Checkbutton(self.window, text=test, variable=checked,
                               onvalue=1, offvalue=0)
             self.widgets.append((value, [checked, val[0]]))
-            box.grid(row=self.task_row, column=1, sticky='W')
+            box.grid(row=self.task_row, column=1, sticky=W)
             self.task_row += 1
         self.task_row += 1
 
@@ -154,12 +155,12 @@ class widgets:
         sex = ld.get_text_from_dict(self.language, sex)
         age = query.adat_person_key(person_id, '~15')[1]
         name_lbl = Label(self.window, text=name, font=self.medium_font)
-        sex_lbl = Label(self.window, text=sex, font=self.medium_font)
-        age_lbl = Label(self.window, text=age, font=self.medium_font)
+        sex_lbl = Label(self.window, text=sex, font=self.medium_font, width = self.width)
+        age_lbl = Label(self.window, text=age, font=self.medium_font, width = self.width)
 
-        name_lbl.grid(row=self.task_row, column=0, sticky='W')
-        sex_lbl.grid(row=self.task_row, column=1, sticky='W')
-        age_lbl.grid(row=self.task_row, column=2, sticky='W')
+        name_lbl.grid(row=self.task_row, column=0, sticky='W', columnspan=2)
+        sex_lbl.grid(row=self.task_row, column=2, sticky='W')
+        age_lbl.grid(row=self.task_row, column=3, sticky='W')
         self.task_row += 1
 
     def clear_widget_data(self):
@@ -194,10 +195,10 @@ class widgets:
         pri_radio_1 = tk.Radiobutton(self.window, text='1', fg="red", variable=self.priority, value=1)
         pri_radio_2 = tk.Radiobutton(self.window, text='2', fg="blue", variable=self.priority, value=2)
         pri_radio_3 = tk.Radiobutton(self.window, text='3', fg="black", variable=self.priority, value=3)
-        pri_lbl.grid(row=self.task_row , column=0,sticky='W')
-        pri_radio_1.grid(row=self.task_row , column=1, sticky='W')
-        pri_radio_2.grid(row=self.task_row , column=2, sticky='W')
-        pri_radio_3.grid(row=self.task_row , column=3, sticky='W')
+        pri_lbl.grid(row=self.task_row , column=0,sticky=W)
+        pri_radio_1.grid(row=self.task_row , column=0, sticky=E)
+        pri_radio_2.grid(row=self.task_row , column=1, sticky=S)
+        pri_radio_3.grid(row=self.task_row , column=2, sticky=W)
         if priority == 1:
             pri_radio_1.invoke()
         elif priority == 2:

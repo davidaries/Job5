@@ -16,6 +16,8 @@ class log_interactor:  # rename to task_reassign
         self.alternate_staff = None
         self.staff_change = False
         self.priority = None
+        self.width = 14
+        self.xpad = 3
 
     def create_buttons(self, row, token, priority):
         self.priority = priority
@@ -24,30 +26,30 @@ class log_interactor:  # rename to task_reassign
             Label(self.window, text=' ').grid(row=row, column=0)
         btn_pause = Button(self.window, text=ld.get_text_from_dict(self.language, '~6'),
                            command=lambda: self.pause_btn_listener(token),
-                           fg="green", bg="light gray", height=1, width=10)
-        btn_pause.grid(row=row, column=0, sticky='S')
+                           fg="green", bg="light gray", height=1, width=self.width)
+        btn_pause.grid(row=row, column=0, sticky=E)
         btn_forward = Button(self.window, text=ld.get_text_from_dict(self.language, '~50'),
                              command=lambda: self.forward_btn_listener(token),
-                             fg="blue", bg="light gray", height=1, width=10)
-        btn_forward.grid(row=row, column=1, sticky='S')
+                             fg="blue", bg="light gray", height=1, width=self.width)
+        btn_forward.grid(row=row, column=1, sticky=S)
         btn_skip = Button(self.window, text=ld.get_text_from_dict(self.language, '~52'),
                           command=lambda: self.skip_btn_listener(token),
-                          fg="red", bg="light gray", height=1, width=10)
-        btn_skip.grid(row=row, column=2, sticky='S')
+                          fg="red", bg="light gray", height=1, width=self.width)
+        btn_skip.grid(row=row, column=2, ipadx = self.xpad, sticky=W)
 
         row += 1
         btn_return = Button(self.window, text=ld.get_text_from_dict(self.language, '~8'),
                             command=lambda: self.return_btn_listener(token),
-                            fg="green", bg="light gray", height=1, width=10)
-        btn_return.grid(row=row, column=0, sticky='S')
+                            fg="green", bg="light gray", height=1, width=self.width)
+        btn_return.grid(row=row, column=0, sticky=E)
         btn_reassign = Button(self.window, text=ld.get_text_from_dict(self.language, '~51'),
                               command=lambda: self.reassign_btn_listener(token),
-                              fg="blue", bg="light gray", height=1, width=10)
-        btn_reassign.grid(row=row, column=1, sticky='S')
+                              fg="blue", bg="light gray", height=1, width=self.width)
+        btn_reassign.grid(row=row, column=1, sticky=S)
         btn_drop = Button(self.window, text=ld.get_text_from_dict(self.language, '~53'),
                           command=lambda: self.drop_btn_listener(token),
-                          fg="red", bg="light gray", height=1, width=10)
-        btn_drop.grid(row=row, column=2, sticky='S')
+                          fg="red", bg="light gray", height=1, width=self.width)
+        btn_drop.grid(row=row, column=2, ipadx = self.xpad, sticky=W)
 
         ### FUNCTIONALITY to enable/ diable buttons
         # btn_drop.config(state = tk.DISABLED)
