@@ -1,27 +1,22 @@
 # murphy.py
 from icecream import ic
+import working_data as wd
 """
 main idea is that something can call a murphy, to get a calculation or some logic
 and the murphy gets the data it needs using query.py
 then return value(s) to whatever called it
-
 at some point review decisioning.xlsx - and maybe shrink it, revise rename it, ...
 and is there anything still of value in murphy.docx?
-
 Okay, a murphy can come in with options of last, earliest, latest. And that would be by each variable I guess
-
 do we still have an issue of order of calling variables?
 since murphy is handling them as a, b, c based on order received
 we need to be sure that they come from the caller in that order
 -- the UI that guides the user in building the call to murphy must do that.
-
 think about how to call data that is relative to other data? Something that must follow something else.
 today we're thinking that is done by querying for plenty of data, and then handling it inside the murphy
-
 Many murphys simply take what it was specified maps_keys_values and do their thing
 Other (future) murphys (e.g., diffdx) might just be called by the Murphy number and would have within them
 (in a data table of some sort) the specs on data what data to call.
-
 On units:
 - Some murphys may need conversion to different units before use (e.g., BMI)
 - for those, when the values are pulled in, there needs to be a specification of the units the murphy expects
@@ -45,7 +40,6 @@ func_dict={'murphy005': lambda p: murphy005(p),  #not sure we will need the form
 def murphy_mkv(person, murphy_num, maps_keys_values):
     """here the murphy is being told by the caller the murphy_num AND what values to evaluate
     this would typically be for a single key and for math operations: averages, trends, etc.
-
     :param person: person whose values to operate on
     :type person: str
     :param murphy_num: the murphy to do
@@ -62,28 +56,38 @@ def murphy_mkv(person, murphy_num, maps_keys_values):
             v = query.adat_person_key(person, key)   # default is to get the most recent
             values.append(v[1])
         if valuespec:
-            last = valuespec[0]
-            earliest = valuespec[1]
-            latest = valuespec[2]
+            try:
+                last = valuespec[0]
+            except:
+                last = 1
+            try:
+                earliest = valuespec[1]
+            except:
+                earliest = None
+            try:
+                latest = valuespec[2]
+            except:
+                latest = None
             vs = query.adat_person_key_options(person, key, last, earliest, latest)
             for v in vs:
                 values.append(v[1])
-    #what it should look like
-    #result = func_dict[murphy_num](values)
-    result = eval(murphy_num + '(' + str(values) + ')')
-    return result
+    result = func_dict[murphy_num](values)
+    datas = {'data': [{'k': key, 'v': (str(result)), 'vt': 'f', 'units': None}]}
+    return datas
+
 
 
 def murphy(person, murphy_num):
     """here the murphy is being told by the caller only the murphy_num
     this would typically be for things (like BMI) where the values to call are built into the murphy
-
     :param person: person whose values to operate on
     :type person: str
     :param murphy_num: the murphy to do
     :type murphy_num: str
     :return: the output of the murphy
     """
+    # print('murphing')
+    # ic(wd.pe_outs)
     result = func_dict[murphy_num](person)
     return result  # but then it needs trimming after reception in the murphy
 
@@ -96,7 +100,6 @@ def murphy(person, murphy_num):
 
 def murmkv003(values):
     """ # calculate average of a list of values
-
     :param values: list with a series of numbers in it
     :type values: list
     :return: the average of the numbers submitted
@@ -111,7 +114,6 @@ def murmkv003(values):
 
 def murmkv004(values):
     """  receives a weight and height and calculates a returns the BMI
-
     :param values: height and weight
     :type values: list with two numbers
     :return: BMI
@@ -123,7 +125,6 @@ def murmkv004(values):
 
 def murphy005(person):
     """   receives a person and calculates and returns the BMI
-
     :param person: person
     :type person: str
     :return: BMI
@@ -143,7 +144,6 @@ Other possible murphy ideas
 trend - this could innumerably complex, depending on how many values, recency, 
   range of measurement error, short term or long term, etc.
   so, trend will be a pretty interesting function
-
 outlier - to score as high or low might also be a function that could be invoked. 
   It would mean hitting a reference table that would have to be local
 """

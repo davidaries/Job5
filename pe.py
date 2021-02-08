@@ -32,7 +32,6 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
         - note, some steps (murphys and decisionings) so the step in called/executed within the call_list processing
             whereas others (UI and at some point external agents) must be written to pe_outs & pe_waits
             and await something in (to be pe_ins) before the step can be completed.
-
     :param pe_ins_sol: queue of solicited inputs
     :type pe_ins_sol: list
     :param pe_ins_unsol: queue of unsolicited inputs
@@ -140,10 +139,14 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
             proto_ = call[0][0]
             step_ = call[0][1]
             call_type = ild.protocols[proto_][step_][2]
-            if call_type == 'murphy':
-                spec = ild.protocols[proto_][step_][3]
-                datas = murphy.murphy(person, spec)
-                calls = ild.protocols[proto_][step_][5].get('call')
+            if call_type in ['murphy', 'murphy_mkv']:
+                if call_type == 'murphy':
+                    spec = ild.protocols[proto_][step_][3]
+                    datas = murphy.murphy(person, spec)
+                else:
+                    murphy_num = ild.protocols[proto_][step_][3][0]
+                    spec = ild.protocols[proto_][step_][3][1]
+                    datas = murphy.murphy_mkv(person, murphy_num, spec)
                 # now we need to create the line to write to pdata
                 pdatm = random.randint(100001, 999999)
                 entity = call[1][2]
@@ -188,7 +191,6 @@ def process_call_for_pe_queues(call, pdata_appendum, pe_outs, pe_waits):
     """ Process calls to made to UI (and in future to external agents)
     creating a new pe_out and pe_wait - by calling create_pe_queues_additions
     then appending them to pe_outs and pe_waits
-
     :param call: the protocol and step to call and its priority
     :type call: list
     :param pdata_appendum: the pdata to append
@@ -206,7 +208,6 @@ def process_call_for_pe_queues(call, pdata_appendum, pe_outs, pe_waits):
 
 def create_pe_queues_additions(call, pdata_appendum):
     """ called by process_call_for_pe_queues to create the additions for two pe queues: pe_outs and pe_waits
-
     :param call: the protocol and step to call and its priority
     :type call: list
     :param pdata_appendum: pdata to be used
@@ -245,7 +246,6 @@ def create_pe_queues_additions(call, pdata_appendum):
 
 def datas_expansion(person, entity, parent, datum):
     """ writes a pdata it receives to adat
-
     :param person: person whose data it is
     :type person: str
     :param entity: entity that the data applies to

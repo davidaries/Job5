@@ -87,11 +87,11 @@ class manage_window:
         self.staff_name = staffer.get('~1')
         self.staff_job = staffer.get('~23')
         self.language = staffer.get('~100')
-
+        self.man_lang = '~101'
         self.device_id = device_id
         self.column_padding = 80
         self.width = 14
-        self.row_current = 2
+        self.row_current = 0
         self.task_row = 0
         self.value_holder = []
         self.widgets = []
@@ -111,7 +111,9 @@ class manage_window:
         if tasks:
             for task in tasks:
                 if self.dat.should_display(task, tasks) and self.at_home:
-                    self.send_data(task, tasks.get(task))
+                    # self.send_data(task, tasks.get(task))
+                    # self.add_column_headers()
+                    self.refresh_home()
                 self.dat.should_update_time(task, self.at_home)
 
         self.root.after(1000, self.poll_controller)
@@ -119,13 +121,18 @@ class manage_window:
     def refresh_home(self):
         """This function simply refreshes the staffers home screen after completing a task"""
         tasks = communicator.get_tasks(self.device_id)
+        # ic(self.device_id)
+        # ic(len(tasks))
         self.at_home = True
         self.clear_window()
         self.set_home()
         if tasks:
             ######################################################
             self.dat.token_time_label.clear()  # MAYBE REWORK THIS
-            for token in self.dat.token_list:  # AND THIS
+            self.dat.name_row.clear()
+            tokens = self.dat.organize_tasks(tasks)
+            # ic(tokens)
+            for token in tokens:  # AND THIS
                 #######################################################
                 self.send_data(token, tasks.get(token))
 
@@ -155,18 +162,23 @@ class manage_window:
         :type task_window_info: list
         :param token: the unique token id for the information handled by the staff member
         :type token: int"""
+        ic(self.device_id,'here', token)
         # task_name = ld.get_text_from_dict(self.language, task_id)
         name = query.adat_person_key(person_id, '~1')[1]  # maybe list handling should be done in query.py
-        label_name = Label(self.window, text=name, font=self.widget_creator.medium_font)
-        label_name.grid(column=0, row=self.row_current, columnspan = 3,sticky=W)
-
+        if not self.dat.check_in_display(name):
+            label_name = Label(self.window, text=name, font=self.widget_creator.medium_font)
+            label_name.grid(column=0, row=self.row_current, columnspan = 3,sticky=W)
+        self.row_current += 1
         btn_process: Button = Button(self.window, text='=>',
                                      command=lambda: self.write_task_screen(task_window_info, person_id, token,
                                                                             task_id, priority),
-                                     fg="black", bg="gray", width=self.width)
-        btn_process.grid(column=3, row=self.row_current, sticky=E)
+                                     fg="black", bg="gray", width=self.width-10)
+        btn_process.grid(column=4, row=self.row_current, sticky=E)
 
-        self.row_current += 1
+        # else:
+        #     self.row_current = self.dat.return_insert_row(name)
+
+        self.dat.add_token_row_name(self.row_current, name)
         btn_log: Button = Button(self.window, text=ld.get_text_from_dict(self.language, '~13'), width=self.width,
                                  command=lambda: self.view_log_data(token), fg="black", bg="gray")
         btn_log.grid(column=0, row=self.row_current)
@@ -194,20 +206,15 @@ class manage_window:
     def set_home(self):
         """This function sets up the home screen for the staffer"""
         spacer = ' '* (53-len(self.staff_name+''+ld.get_text_from_dict(self.language,self.staff_job)))
-        self.window.title(self.staff_name+spacer+ld.get_text_from_dict(self.language,self.staff_job))
-        # staff_name = Label(self.window, text=self.staff_name, font=self.widget_creator.larger_font)
-        # staff_name.grid(column=0, row=0, columnspan=2, sticky=W)
-        # staff_job = Label(self.window, text=ld.get_text_from_dict(self.language, self.staff_job),
-        #                   font=self.widget_creator.larger_font)
-        # staff_job.grid(column=2, row=0, columnspan=2, sticky=E)
+        self.window.title(self.staff_name+spacer+ld.get_text_from_dict(self.man_lang,self.staff_job))
         self.add_column_headers()
 
     def add_column_headers(self):
         """This function adds the headers for the tasks in the home screen"""
         label_priority = Label(self.window, text='', width=self.width, borderwidth=3)
         label_priority.grid(column=0, row=self.row_current, sticky=W)
-        label_priority = Label(self.window, text=ld.get_text_from_dict(self.language, '~49') + '  ',
-                               font=self.widget_creator.medium_font, width=self.width, borderwidth=3, relief=GROOVE)
+        label_priority = Label(self.window, text=ld.get_text_from_dict(self.language, '~49')[0:3] + '  ',
+                               font=self.widget_creator.medium_font, width=self.width-10, borderwidth=3, relief=GROOVE)
         label_priority.grid(column=1, row=self.row_current, sticky=W)
         label_status = Label(self.window, text=ld.get_text_from_dict(self.language, '~48') + '  ',
                              font=self.widget_creator.medium_font, width=self.width, borderwidth=3, relief=GROOVE)
@@ -228,7 +235,7 @@ class manage_window:
 
         priority_color = {1: "red", 2: "blue", 3: "black"}
 
-        label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font, width = self.width,
+        label_priority = Label(self.window, text=priority, font=self.widget_creator.medium_font, width = self.width-10,
                                fg=priority_color.get(priority),borderwidth=3, relief=GROOVE)
         label_priority.grid(column=1, row=self.row_current)
         label_status = Label(self.window, text=ld.get_text_from_dict(self.language, status), width = self.width,
@@ -325,7 +332,7 @@ class manage_window:
             self.dat.tokens_completed.append(self.working_token)
             self.working_token = None
             self.widget_creator.clear_widget_data()
-            self.task_row = 10
+            self.task_row = 0
             self.set_home()
             self.refresh_home()
 

@@ -22,7 +22,10 @@ log_dict = {}
 token_status_dict ={}
 flow_data = {}
 
-
+# adat is a dictionary where the key is the person, and then each person is a dictionary
+# where the key is k, and value is a list with lists (inner lists) within.
+# each of the inner lists has the following seven fields.
+# adatm[0], entity[1], parent[2], vt[3], v[4], units[5], event_dts[6]
 adat = {
     'pers101': {
         '~1': [[101, None, None, 's', 'Tina Quarintina-Hugo-Cortez', None, 1603824276.5]],

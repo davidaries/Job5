@@ -54,7 +54,7 @@ class sim_staff_window_manager:
         self.root = master
         self.log_window_pointer = log_window
         self.horizontal_spacing = 0
-        self.vertical_spacing = -200
+        self.vertical_spacing = -250
         self.column_padding = 80
         self.row_padding = 12
         self.row_current = 2
@@ -70,10 +70,10 @@ class sim_staff_window_manager:
         :return: a reference to a window so it can be edited in the future
         :rtype: Window"""
         if self.window_count % 4 == 0:
-            self.vertical_spacing += 350
+            self.vertical_spacing += 400
             self.horizontal_spacing = 0
         screen = Toplevel(self.root)
-        screen.geometry("470x300+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
+        screen.geometry("475x350+" + str(self.horizontal_spacing) + '+' + str(self.vertical_spacing))
         self.horizontal_spacing += 500
         return screen
 

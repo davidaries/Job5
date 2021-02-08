@@ -18,8 +18,6 @@ def update_log(token, device_id, status, comments, priority):
 
 
 def change_staffer(token, current_staffer, alternate_staffer, status):
-    ic(alternate_staffer)
-    ic(current_staffer)
     new_staff_device = None
     try:
         if alternate_staffer[0] == 's':
@@ -40,6 +38,8 @@ def return_data(token, data_return):
     :type token: int
     :param data_return: list of the corresponding data for the token
     :type data_return: list"""
+    # ic(token, data_return)
+    ic('returning',token)
     flow_info = None
     if token in wd.flow_data:
         flow_info = wd.flow_data.get(token)
