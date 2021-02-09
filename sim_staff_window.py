@@ -162,7 +162,7 @@ class manage_window:
         :type task_window_info: list
         :param token: the unique token id for the information handled by the staff member
         :type token: int"""
-        ic(self.device_id,'here', token)
+        # ic(self.device_id,'here', token)
         # task_name = ld.get_text_from_dict(self.language, task_id)
         name = query.adat_person_key(person_id, '~1')[1]  # maybe list handling should be done in query.py
         if not self.dat.check_in_display(name):

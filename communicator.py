@@ -39,7 +39,7 @@ def return_data(token, data_return):
     :param data_return: list of the corresponding data for the token
     :type data_return: list"""
     # ic(token, data_return)
-    ic('returning',token)
+    # ic('returning',token)
     flow_info = None
     if token in wd.flow_data:
         flow_info = wd.flow_data.get(token)
