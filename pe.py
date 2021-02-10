@@ -174,26 +174,14 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
                 # ic('callT UI')
                 process_call_for_pe_queues(call[0], call[1], call[2], call[3])
             elif call_type == 'decisioning':
-                print("DECISIONING")
-                ic(ild.protocols[proto_][step_][5].get('call'))
                 existing_calls_for_step = ild.protocols[proto_][step_][5].get('call')  # get any pre-specified steps
-                ic('existing',existing_calls_for_step)
+                for existing_call in existing_calls_for_step:                          # for each step append it here.
+                    calls_list.append([existing_call, pdata_appendum, pe_outs, pe_waits])
                 decision_spec = ild.protocols[proto_][step_][3]          # get the decision spec
-                decided_ = decisioning.decision(person, decision_spec)   # get a decision: new protocol/step(s) to call
-                ic(decided_)
-                if decided_:                              # append the new calls of any pre-existing calls
-                    decided = decided_.get('call')[0]
-                    ic(decided)
-                    try:
-                        print("ADDING")
-                        existing_calls_for_step.append(decided)
-                    except:
-                        existing_calls_for_step = decided
-                new_flows = existing_calls_for_step
-                ic(new_flows)
-                for new_flow in new_flows:                # for each call append it here.
-                    ic('appending from decisioning')
-                    calls_list.append([new_flow, pdata_appendum, pe_outs, pe_waits])
+                new_calls = decisioning.decision(person, decision_spec)  # get any new calls pers decision spec
+                if new_calls:                                             # if calls append each step
+                    for new_call in new_calls.get('call'):
+                        calls_list.append([new_call, pdata_appendum, pe_outs, pe_waits])
             else:                                       # at some future point there will be other call_types
                 pass
 # ### END - PE - the Protocol Engine #############################################################################
