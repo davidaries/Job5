@@ -1,4 +1,6 @@
-"""This class contains the language dictionary to be used in other classes of this program
+"""This modules contains the language dictionary to be used in the program
+It will at the completion of Job 7 be replaced by a process that imports the language dictionary from
+a SQLite table.
 :param english: this dictionary contains the english vocabulary used in this program.  Based on the key value
     the corresponding word is returned.  The layout for the key value is '~NUMBER'
 :type english: dict

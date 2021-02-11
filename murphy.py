@@ -1,7 +1,4 @@
-# murphy.py
-from icecream import ic
-import working_data as wd
-"""
+""" murphy.py
 main idea is that something can call a murphy, to get a calculation or some logic
 and the murphy gets the data it needs using query.py
 then return value(s) to whatever called it
@@ -86,8 +83,6 @@ def murphy(person, murphy_num):
     :type murphy_num: str
     :return: the output of the murphy
     """
-    # print('murphing')
-    # ic(wd.pe_outs)
     result = func_dict[murphy_num](person)
     return result  # but then it needs trimming after reception in the murphy
 

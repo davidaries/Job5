@@ -86,7 +86,6 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
                 replacing_pe_out = [pe_wait[0], new_token, returning_pe_out_core] ####
                 replacing_pe_outs.append(replacing_pe_out)
             if calls:  # there can be more than one call
-                ic(calls)
                 for call in calls:
                     calls_list.append([call, pdata_appendum, pe_outs, pe_waits])    # Jan 22 wondering if we need to / should send pe_outs and pe_waits to the call_list every time
             # And finally need to remove the lines processed from pe_outs and pe_waits
@@ -99,7 +98,6 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
 
             for replacing_pe_wait in replacing_pe_waits:
                 pe_waits[replacing_pe_wait[0]] = replacing_pe_wait[1]  # adds to pe_waits
-                # ic(pe_waits)
 
 
     if pe_ins_unsol:
@@ -141,7 +139,6 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
             proto_ = call[0][0]
             step_ = call[0][1]
             call_type = ild.protocols[proto_][step_][2]
-            # ic(len(calls_list), call_type)
             if call_type in ['murphy', 'murphy_mkv']:
                 if call_type == 'murphy':
                     spec = ild.protocols[proto_][step_][3]
@@ -168,10 +165,8 @@ def protocol_engine(pe_ins_sol, pe_ins_unsol, pe_outs, pe_waits, pdata):
                         if call_type_fm == 'UI':
                             process_call_for_pe_queues(call_fm, pdata_appendum, pe_outs, pe_waits)  # send to UI process
                         elif call_type_fm in ['murphy', 'decisioning']:
-                            ic('Murphy UI')
                             calls_list.append([call_fm, pdata_appendum, pe_outs, pe_waits])  # append here for process
             elif call_type == 'UI':                # send to UI process
-                # ic('callT UI')
                 process_call_for_pe_queues(call[0], call[1], call[2], call[3])
             elif call_type == 'decisioning':
                 existing_calls_for_step = ild.protocols[proto_][step_][5].get('call')  # get any pre-specified steps
@@ -201,10 +196,8 @@ def process_call_for_pe_queues(call, pdata_appendum, pe_outs, pe_waits):
     :param pe_waits: existing pe_waits
     :type pe_waits: dict
     """
-    # ic('BEFORE', wd.pe_outs.get('456'))
     pe_out, pe_wait = create_pe_queues_additions(call, pdata_appendum)  # call function to get pe_out & pe_wait
     pe_outs[pe_out[0]][pe_out[1]] = pe_out[2]    # this adds the new pe_out to pe_outs
-    # ic('AFTER', wd.pe_outs.get('456'))
     if pe_wait[1]:    # this if because without it when a protocol ended we'd get a empty pe_wait written anyway
         pe_waits[pe_wait[0]] = pe_wait[1]        # this adds the new pe_wait to pe_waits
 
@@ -221,7 +214,6 @@ def create_pe_queues_additions(call, pdata_appendum):
     #                                 protocol[4], step[5], thread[6], record_dts[7], datas[8]]
     protocol, step, priority = call[0], call[1], call[2]
     token = random.randint(1000000000000001, 9999999999999999)
-    # ic(token, pdata_appendum)
     # the next fields are read directly from pdata_addendum
     caller = pdata_appendum[0]
     person = pdata_appendum[1]

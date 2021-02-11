@@ -1,12 +1,28 @@
-import simulation_time
-from icecream import ic
-pdata = []
-pe_ins_sol = []  # protocol engine inputs
-pe_ins_unsol = []
-pe_outs = {}  # protocol engine outputs
-pe_waits = {}  # protocol engine waits
-pe_outs['123'] = {}  # when a staff member signs in with a device the device needs an empty dictionary
-pe_outs['234'] = {}  # these four pe_outs rows will go away when we have a staff sign in process
+"""working_data.py
+This seems a hydrid module.
+1. It is a place to create and reference certain 'global-ish' variables. See lines 7-16
+-- Is this how to best do this?
+2. It creates some initial entries for the pe_outs dictionary
+-- These lines should go away with a proper staff sign-in process
+3. It creates an initial adat dictionary for use
+-- These lines will go away when the initial adat is created from reading in existing pdata at app startup.
+"""
+
+pdata = []             # existing pdata at startup - for now (only) is empty, which is why we have adat below.
+pe_ins_sol = []        # protocol engine solicited inputs
+pe_ins_unsol = []      # protocol engine unsolicited inputs
+pe_waits = {}          # protocol engine waits
+pe_outs = {}           # protocol engine outputs
+
+log_dict = {}
+token_status_dict ={}
+flow_data = {}
+
+
+# when a staff member signs in with a device the device needs an empty dictionary
+# these pe_outs rows will go away when we have a staff sign in process as the empty dictionary will be created then
+pe_outs['123'] = {}
+pe_outs['234'] = {}
 pe_outs['345'] = {}
 pe_outs['456'] = {}
 pe_outs['567'] = {}
@@ -18,9 +34,6 @@ pe_outs['765'] = {}
 pe_outs['654'] = {}
 pe_outs['543'] = {}
 
-log_dict = {}
-token_status_dict ={}
-flow_data = {}
 
 # adat is a dictionary where the key is the person, and then each person is a dictionary
 # where the key is k, and value is a list with lists (inner lists) within.

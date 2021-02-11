@@ -29,15 +29,15 @@ def simulate():
         check_entrant()
     simulation_time.root.after(1000, simulate)
 
-######This code calls to set up the UI the sim time then begins the simulation
+# This code calls to set up the UI sim time then begins the simulation
 sim_create_ui.setup_ui()
 simulation_time.clock()
 simulate()
-simulation_time.root.mainloop()# this must be included here (the 'mainloop' of the tk root) for the UI to function
-                               # not sure if there is a better way to handle this
-
-
+simulation_time.root.mainloop()  # must be included here (the 'mainloop' of the tk root) for the UI to function
+                                 # not sure if there is a better way to handle this
 # ### END - simulation ##########################################################
+
+
 def poll_tasks(device_id):
     """This returns a list of tasks to be displayed in a staffer's window
     :param device_id: unique id of a staffers device

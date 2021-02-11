@@ -1,18 +1,15 @@
-# get_responsible_staff.py
+"""# get_responsible_staff.py
+This module has functions to identify a staff member to be responsible for a protocol step.
+get_staffer receives from the caller the protocol and step
+  it uses get_staff_type to get the role needed to do that step
+  and then get_staffer to identify and individual staff with that role
+  and finally gets their device id and returns it.
+
+Something here on get_other_staffers
+"""
+
 import initial_load_data as ild
 from icecream import ic
-
-
-def get_staff_type(protocol, step):  # get the staff_type who is responsible for the step in the protocol
-    staffer_type = ild.protostep_staff[protocol][step]
-    return staffer_type
-
-
-# when we are getting a staffer with this still give a staffer who is trying to reassign a task
-def get_staffer(staff_type):  # get the staffer who is responsible for the step in the protocol
-    for s in ild.staffers:  # currently gets the first staffer who matches on staff_type, much more to be done!
-        if ild.staffers[s]['~23'] == staff_type:
-            return s
 
 
 def get_device_out(protocol, step):
@@ -21,10 +18,21 @@ def get_device_out(protocol, step):
     device_out = ild.staff_device[staffer]  # then get the device_out based on the staffer
     return device_out
 
-# for rest of staffers staff_type, current_staffer
-def get_other_staffers(staff_type, current_staffer, list):  # get the staffer who is responsible for the step in the protocol
+
+def get_staff_type(protocol, step):  # get the staff_type who is responsible for the step in the protocol
+    staffer_type = ild.protostep_staff[protocol][step]
+    return staffer_type
+
+
+def get_staffer(staff_type):  # get a staffer who can be responsible for the step in the protocol
+    for s in ild.staffers:    # currently gets the first staffer who matches on staff_type, much more to be done!
+        if ild.staffers[s]['~23'] == staff_type:
+            return s
+
+
+def get_other_staffers(staff_type, current_staffer, list):  # get other staffers who can be responsible for the step
     staff_choices = []
-    for s in ild.staffers:  # currently gets the first staffer who matches on staff_type, much more to be done!
+    for s in ild.staffers:
         if ild.staffers[s]['~23'] == staff_type and s is not current_staffer:
             if not list:
                 return s
